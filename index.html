@@ -2,797 +2,1665 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>工具箱</title>
-
-    <!-- Font Awesome 图标库 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>多图层编辑器</title>
     <style>
-        /* ===== 全局重置 ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
+        /* ----- 修改：移除 flex 居中，改为正常文档流，让 body 成为滚动容器 ----- */
         body {
-            font-family: 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
             min-height: 100vh;
-            background: #f5f7fb;
-            display: flex;
-            justify-content: center;
-            padding: 2rem 1.5rem 3rem;
+            background: #f0f2f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+            touch-action: manipulation;
         }
-
+        /* ----- 新增：容器水平居中 ----- */
         .container {
-            max-width: 1200px;
+            max-width: 860px;
             width: 100%;
-        }
-
-        /* ===== 头部（点击触发密码） ===== */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 1.2rem;
-            border-bottom: 1px solid #e9edf4;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            cursor: pointer;  /* 暗示可点击 */
-            user-select: none;
-        }
-
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-
-        .header h1 i {
-            color: #667eea;
-            margin-right: 0.4rem;
-        }
-
-        .badge {
-            background: #eef2f7;
-            padding: 0.25rem 1rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            color: #475569;
-            font-weight: 500;
-        }
-
-        .badge span {
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        /* ===== 卡片网格 ===== */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem;
-            min-height: 200px;
-        }
-
-        .tool-card {
+            margin: 0 auto;
             background: #ffffff;
-            border-radius: 20px;
-            padding: 1.6rem 1.2rem 1.4rem;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            border: 1px solid #edf2f7;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            user-select: none;
+            padding: 20px 18px 28px;
         }
-
-        .tool-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 36px rgba(102, 126, 234, 0.12);
-            border-color: #d0d9e8;
-        }
-
-        .tool-card:active {
-            transform: translateY(-2px) scale(0.98);
-        }
-
-        .tool-icon {
-            font-size: 2.4rem;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-            color: #667eea;
-        }
-
-        .tool-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #0b1a33;
-            margin-bottom: 0.2rem;
-        }
-
-        .tool-desc {
-            font-size: 0.82rem;
-            color: #8896ab;
-            line-height: 1.4;
-            flex: 1;
-            margin-bottom: 0.6rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .card-footer {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            font-size: 0.75rem;
-            color: #b0bcca;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .tool-card:hover .card-footer {
-            color: #667eea;
-        }
-
-        .card-footer i {
-            margin-left: 0.3rem;
-            font-size: 0.65rem;
-            transition: transform 0.2s;
-        }
-
-        .tool-card:hover .card-footer i {
-            transform: translateX(3px);
-        }
-
-        /* ===== 空状态 ===== */
-        .empty-state {
-            grid-column: 1 / -1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 4rem 2rem;
-            background: transparent;
-            border: none;
-            min-height: 280px;
-        }
-
-        .empty-state i {
-            font-size: 2.8rem;
-            color: #e2e8f0;
-        }
-
-        /* ===== 密码弹窗 ===== */
-        .password-overlay {
-            position: fixed;
+        /* ===== 画布区域粘性固定 ===== */
+        .sticky-section {
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.50);
-            backdrop-filter: blur(6px);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .password-overlay.active {
-            display: flex;
-        }
-
-        .password-modal {
             background: #ffffff;
-            border-radius: 28px;
-            padding: 40px 44px 36px;
-            max-width: 400px;
-            width: 92%;
-            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.30);
-            text-align: center;
-            animation: slideUp 0.3s ease;
+            z-index: 20;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eef2f8;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
         }
-
-        .password-modal .lock-icon {
-            font-size: 52px;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .password-modal h2 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-
-        .password-modal .sub {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 22px;
-        }
-
-        .password-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .password-input-group input {
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 16px;
-            outline: none;
-            text-align: center;
-            letter-spacing: 6px;
-            font-weight: 600;
-            transition: border-color 0.25s, box-shadow 0.25s;
-        }
-
-        .password-input-group input:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
-        }
-
-        .password-input-group .pwd-error {
-            color: #ef4444;
-            font-size: 13px;
-            font-weight: 500;
-            min-height: 22px;
-        }
-
-        .password-btn {
-            padding: 14px;
-            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-            color: #fff;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.12s, box-shadow 0.2s;
-            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.25);
-        }
-
-        .password-btn:hover {
-            box-shadow: 0 6px 28px rgba(124, 58, 237, 0.35);
-            transform: translateY(-1px);
-        }
-
-        .password-btn:active {
-            transform: scale(0.96);
-        }
-
-        .password-cancel-btn {
-            padding: 10px;
-            background: none;
-            color: #94a3b8;
-            border: none;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .password-cancel-btn:hover {
-            color: #64748b;
-        }
-
-        /* ===== 记事本弹窗（只读） ===== */
-        .note-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.50);
-            backdrop-filter: blur(6px);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .note-overlay.active {
-            display: flex;
-        }
-
-        .note-modal {
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 32px 36px 28px;
-            max-width: 680px;
-            width: 94%;
-            max-height: 88vh;
-            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.30);
-            display: flex;
-            flex-direction: column;
-            animation: slideUp 0.3s ease;
+        /* 确保画布容器内部的相对定位不受干扰 */
+        .canvas-wrapper {
             position: relative;
+            background: #eef0f4;
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            min-height: 220px;
         }
-
-        .note-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .note-modal-header h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .note-modal-header .badge {
-            font-size: 12px;
-            font-weight: 600;
-            color: #94a3b8;
-            background: #f1f5f9;
-            padding: 4px 14px;
-            border-radius: 40px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .note-modal-close {
-            background: none;
-            border: none;
-            font-size: 26px;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 0 6px;
-            transition: color 0.2s, transform 0.2s;
-            line-height: 1;
-        }
-
-        .note-modal-close:hover {
-            color: #ef4444;
-            transform: rotate(90deg);
-        }
-
-        .note-display {
-            width: 100%;
-            min-height: 320px;
-            max-height: 55vh;
-            padding: 18px 22px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 15px;
-            font-family: 'Segoe UI', 'PingFang SC', 'SF Mono', monospace;
-            line-height: 1.9;
-            color: #1e293b;
-            background: #fafbfc;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
-            user-select: text;
-            cursor: default;
-        }
-
-        .note-display::-webkit-scrollbar {
-            width: 6px;
-        }
-        .note-display::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 8px;
-        }
-        .note-display::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 8px;
-        }
-        .note-display::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        .note-modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-
-        .note-btn-close {
-            padding: 10px 32px;
-            border: none;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            background: #f1f3f5;
-            color: #475569;
-            transition: transform 0.12s, box-shadow 0.2s;
-        }
-
-        .note-btn-close:hover {
-            background: #e9edf2;
-        }
-
-        .note-btn-close:active {
-            transform: scale(0.96);
-        }
-
-        .note-footer-hint {
-            font-size: 12px;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* ===== 动画 ===== */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
+        .upload-area { border:2px dashed #d0d7e2; border-radius:12px; padding:12px 14px; text-align:center; cursor:pointer; background:#fafcff; margin-bottom:14px; transition:background 0.2s, border-color 0.2s; -webkit-tap-highlight-color:transparent; }
+        .upload-area:active { background:#eaf1fe; border-color:#7a8ba3; }
+        .upload-area label { display:block; font-size:15px; color:#3d4a5c; font-weight:450; cursor:pointer; }
+        .upload-area label span { display:inline-block; background:#e6ecf5; padding:5px 16px; border-radius:40px; font-weight:500; color:#1f2a3a; margin-top:4px; }
+        #fileInput { display:none; }
+        #imageCanvas { display:block; max-width:100%; max-height:520px; cursor:default; background:#eef0f4; width:auto; height:auto; touch-action:none; -webkit-touch-callout:none; -webkit-user-select:none; }
+        #overlayCanvas { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; display:none; }
+        .zoom-indicator { position:absolute; top:12px; left:14px; background:rgba(20,28,40,0.7); backdrop-filter:blur(4px); color:#f0f4fc; padding:4px 12px; border-radius:30px; font-size:13px; font-weight:500; font-family:"SF Mono","Menlo",monospace; pointer-events:none; user-select:none; opacity:0; transition:opacity 0.25s ease; z-index:2; }
+        .zoom-indicator.show { opacity:1; }
+        .hint-msg { margin:8px 0 0 4px; font-size:13px; color:#7a8aa0; user-select:none; }
+        .info-section { margin:14px 0 18px; }
+        .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 24px; background:#f8faff; border-radius:12px; padding:10px 14px; }
+        .info-item { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid #eef2f8; font-size:14px; }
+        .info-item .label { color:#7c8aa0; font-weight:450; }
+        .info-item .value { color:#1a2330; font-weight:500; font-family:"SF Mono","Menlo",monospace; font-size:13px; text-align:right; }
+        .color-preview { display:flex; align-items:center; gap:14px; margin-bottom:6px; padding:0 14px; }
+        .color-swatch { width:38px; height:38px; border-radius:12px; border:1px solid #dee5ef; flex-shrink:0; background:#888; }
+        .color-hex-large { font-size:18px; font-weight:500; color:#1a2330; letter-spacing:0.5px; word-break:break-all; }
+        .export-section { display:flex; gap:10px; flex-wrap:wrap; margin-top:4px; }
+        .export-btn { flex:1; min-width:68px; padding:12px 0; border:none; border-radius:14px; background:#edf0f6; color:#1f2a3a; font-size:15px; font-weight:500; cursor:pointer; transition:background 0.18s, transform 0.1s; font-family:inherit; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+        .export-btn:active { transform:scale(0.94); background:#d5dce6; }
+        .export-btn[data-format="png"] { background:#e3eaf7; color:#1c3b6b; }
+        .export-btn[data-format="jpg"] { background:#f7ede6; color:#6b3d1c; }
+        .export-btn[data-format="webp"] { background:#e6f7ed; color:#1c6b3d; }
+        .export-btn[data-format="bmp"] { background:#efe6f7; color:#4a1c6b; }
+        .export-btn:active[data-format="png"] { background:#c8d6ed; }
+        .export-btn:active[data-format="jpg"] { background:#edd5c4; }
+        .export-btn:active[data-format="webp"] { background:#c4edcf; }
+        .export-btn:active[data-format="bmp"] { background:#d9c4ed; }
+        .advanced-panel { margin-top:14px; padding:16px 14px 18px; background:#f8faff; border-radius:16px; border:1px solid #e6ebf3; max-height:650px; overflow-y:auto; }
+        .adv-group { margin-bottom:16px; }
+        .adv-group-title { font-size:14px; font-weight:600; color:#2c3e5a; margin-bottom:8px; letter-spacing:0.3px; }
+        .adv-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+        .adv-row label { font-size:13px; color:#4a5a72; min-width:40px; }
+        .adv-row input[type="number"] { width:70px; padding:5px 8px; border:1px solid #d0d7e2; border-radius:8px; font-size:13px; background:#fff; font-family:inherit; }
+        .adv-row input[type="number"]:focus { outline:none; border-color:#7a8ba3; }
+        .adv-row input[type="range"] { flex:1; min-width:100px; accent-color:#3d6b9b; }
+        .adv-row .value-label { min-width:36px; font-size:13px; color:#3d4a5c; font-weight:500; }
+        .adv-btn { padding:6px 18px; border:none; border-radius:30px; background:#e6ecf5; font-size:13px; font-weight:500; color:#1f2a3a; cursor:pointer; transition:background 0.15s; font-family:inherit; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+        .adv-btn:active { background:#cdd6e3; }
+        .adv-btn.primary { background:#2c3e5a; color:#fff; }
+        .adv-btn.primary:active { background:#1a2a3f; }
+        .adv-btn.danger { background:#e8d5d5; color:#7a3a3a; }
+        .adv-btn.danger:active { background:#dbbdbd; }
+        .layer-list { display:flex; flex-direction:column; gap:6px; margin-top:4px; max-height:180px; overflow-y:auto; border:1px solid #e2e6ee; border-radius:12px; padding:6px 8px; background:#fff; }
+        .layer-item { display:flex; align-items:center; gap:8px; padding:4px 6px; border-radius:10px; background:#fafcff; border:1px solid #eef2f8; transition:background 0.15s, border-color 0.15s; user-select:none; min-height:40px; }
+        .layer-item.selected { border-color:#2c3e5a; background:#eaf1fe; }
+        .layer-item .thumb { width:32px; height:32px; border-radius:6px; object-fit:cover; background:#eef0f4; border:1px solid #d0d7e2; flex-shrink:0; }
+        .layer-item .layer-name { flex:1; font-size:13px; font-weight:500; color:#1f2a3a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .layer-item .layer-actions { display:flex; gap:0px; align-items:center; flex-shrink:0; }
+        .layer-item .layer-actions button { background:none; border:none; font-size:16px; cursor:pointer; padding:2px 4px; border-radius:6px; transition:background 0.1s; line-height:1; color:#2c3e5a; touch-action:manipulation; -webkit-tap-highlight-color:transparent; min-width:28px; min-height:28px; display:flex; align-items:center; justify-content:center; }
+        .layer-item .layer-actions button:active { background:#d0d7e2; }
+        .layer-item .layer-actions .vis-toggle { font-size:16px; }
+        .layer-item .layer-actions .del-btn { color:#b33; font-size:16px; }
+        .layer-item .layer-actions .move-btn { font-size:14px; color:#4a5a72; padding:2px 3px; }
+        .layer-item .layer-actions .move-btn:disabled { opacity:0.3; cursor:not-allowed; }
+        .layer-controls { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; align-items:center; }
+        .layer-controls .adv-row { margin-bottom:0; }
+        .tool-group { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:4px; }
+        .tool-group .adv-btn { min-width:80px; }
+        .tool-group .adv-btn.active { background:#2c3e5a; color:#fff; }
+        .erase-tool { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .erase-tool label { font-size:13px; color:#4a5a72; }
+        .erase-tool input[type="range"] { width:120px; accent-color:#3d6b9b; }
+        .erase-tool .size-val { min-width:30px; font-size:13px; font-weight:500; }
+        @media (max-width:500px) { .container { padding:12px 10px 16px; } .info-grid { grid-template-columns:1fr; gap:0; padding:6px 12px; } .info-item { font-size:13px; padding:4px 0; } .export-btn { font-size:14px; padding:11px 0; min-width:58px; } .color-hex-large { font-size:16px; } .adv-row input[type="number"] { width:60px; } .adv-row { gap:6px; } .layer-item { padding:3px 4px; min-height:36px; gap:6px; } .layer-item .thumb { width:28px; height:28px; } .layer-item .layer-actions button { font-size:14px; padding:2px 3px; min-width:24px; min-height:24px; } .layer-item .layer-actions .move-btn { font-size:12px; } .layer-item .layer-actions .vis-toggle { font-size:14px; } .layer-item .layer-actions .del-btn { font-size:14px; } .erase-tool input[type="range"] { width:80px; } }
+        @media (hover:none) { .export-btn:hover { background:inherit; } .export-btn:hover[data-format="png"] { background:#e3eaf7; } .export-btn:hover[data-format="jpg"] { background:#f7ede6; } .export-btn:hover[data-format="webp"] { background:#e6f7ed; } .export-btn:hover[data-format="bmp"] { background:#efe6f7; } .upload-area:hover { background:#fafcff; border-color:#d0d7e2; } }
+        /* ----- 额外：手机上让粘性区域更紧凑，避免遮挡太多 ----- */
+        @media (max-width: 500px) {
+            .sticky-section {
+                padding-bottom: 6px;
             }
-            to {
-                opacity: 1;
+            .sticky-section .info-section {
+                margin: 8px 0 10px;
             }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.96);
+            .sticky-section .export-section {
+                margin-top: 0;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
+            .sticky-section .upload-area {
+                margin-bottom: 8px;
+                padding: 8px 10px;
             }
-        }
-
-        @keyframes shake {
-            0%,
-            100% {
-                transform: translateX(0);
+            .sticky-section .hint-msg {
+                margin: 4px 0 0 4px;
+                font-size: 12px;
             }
-            20% {
-                transform: translateX(-10px);
+            .canvas-wrapper {
+                min-height: 160px;
             }
-            40% {
-                transform: translateX(10px);
+            #imageCanvas {
+                max-height: 340px;
             }
-            60% {
-                transform: translateX(-6px);
-            }
-            80% {
-                transform: translateX(6px);
-            }
-        }
-
-        /* ===== 响应式 ===== */
-        @media (max-width: 768px) {
-            body {
-                padding: 1.2rem 1rem 2rem;
-            }
-            .header h1 {
-                font-size: 1.4rem;
-            }
-            .grid {
-                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-                gap: 1rem;
-            }
-            .tool-card {
-                padding: 1.2rem 0.9rem 1rem;
-            }
-            .tool-icon {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 0.8rem;
-            }
-            .header h1 {
-                font-size: 1.2rem;
-            }
-            .badge {
-                font-size: 0.75rem;
-                padding: 0.2rem 0.8rem;
-            }
-            .tool-name {
-                font-size: 0.95rem;
-            }
-            .tool-desc {
-                font-size: 0.72rem;
-            }
-        }
-
-        @media (max-width: 359px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #eef2f7;
-            border-radius: 6px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d0d9e8;
-            border-radius: 6px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #b0bcca;
         }
     </style>
 </head>
-
 <body>
 
     <div class="container">
+        <!-- ===== 粘性区域：从上传到导出，滚动时固定在顶部 ===== -->
+        <div class="sticky-section">
+            <div class="upload-area" id="uploadArea">
+                <label for="fileInput">
+                    <span>📁 点击上传图片 (添加为图层)</span><br />
+                    <span style="font-weight:400; color:#6a7b8e; font-size:14px; display:inline-block; margin-top:4px;">JPG / PNG / WebP / BMP</span>
+                </label>
+                <input type="file" id="fileInput" accept="image/*" multiple />
+            </div>
 
-        <!-- ===== 头部（点击5次触发密码） ===== -->
-        <header class="header" id="headerTrigger">
-            <h1><i class="fas fa-toolbox"></i>工具箱</h1>
-            <span class="badge"><i class="far fa-folder-open"></i> 共 <span id="toolCount">0</span> 个工具</span>
-        </header>
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <canvas id="imageCanvas"></canvas>
+                <canvas id="overlayCanvas"></canvas>
+                <div class="zoom-indicator" id="zoomIndicator">100%</div>
+            </div>
 
-        <!-- ===== 卡片网格 ===== -->
-        <div class="grid" id="toolGrid">
-            <!-- 由 JavaScript 动态渲染 -->
-        </div>
+            <div class="hint-msg" id="hintMsg">💡 选中图层才可对图层进行操作</div>
 
-    </div>
+            <div class="info-section">
+                <div class="color-preview">
+                    <div class="color-swatch" id="colorSwatch" style="background:#a0aab8;"></div>
+                    <span class="color-hex-large" id="hexDisplay">—</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item"><span class="label">HEX</span><span class="value" id="vHex">—</span></div>
+                    <div class="info-item"><span class="label">RGB</span><span class="value" id="vRgb">—</span></div>
+                    <div class="info-item"><span class="label">HSL</span><span class="value" id="vHsl">—</span></div>
+                    <div class="info-item"><span class="label">HSV</span><span class="value" id="vHsv">—</span></div>
+                    <div class="info-item"><span class="label">CMYK</span><span class="value" id="vCmyk">—</span></div>
+                </div>
+            </div>
 
-    <!-- ============================================================
-    📝 笔记内容定义（您在这里修改笔记！）
-    下方 div#noteSource 中的文字就是所有访问者看到的笔记内容。
-    修改后保存文件即可，无需任何其他操作。
-    ============================================================ -->
-    <div id="noteSource" style="display:none;">
-        欢迎访问
-		
-    </div>
-
-    <!-- ============================================================
-    🔒 密码弹窗
-    ============================================================ -->
-    <div class="password-overlay" id="passwordOverlay">
-        <div class="password-modal">
-            <span class="lock-icon">🔒</span>
-            <h2>输入密码</h2>
-            <p class="sub">请输入密码以查看隐藏记事本</p>
-            <div class="password-input-group">
-                <input type="password" id="passwordInput" placeholder="请输入密码" maxlength="20" autocomplete="off" />
-                <div class="pwd-error" id="pwdError"></div>
-                <button class="password-btn" id="pwdConfirmBtn">确认</button>
-                <button class="password-cancel-btn" id="pwdCancelBtn">取消</button>
+            <div class="export-section">
+                <button class="export-btn" data-format="png">PNG</button>
+                <button class="export-btn" data-format="jpg">JPG</button>
+                <button class="export-btn" data-format="webp">WEBP</button>
+                <button class="export-btn" data-format="bmp">BMP</button>
             </div>
         </div>
-    </div>
+        <!-- ===== 粘性区域结束 ===== -->
 
-    <!-- ============================================================
-    📖 记事本弹窗（只读展示）
-    ============================================================ -->
-    <div class="note-overlay" id="noteOverlay">
-        <div class="note-modal">
-            <div class="note-modal-header">
-                <h2>
-                    <i>📓</i> 我的笔记
-                    <span class="badge">🔒 只读</span>
-                </h2>
-                <button class="note-modal-close" id="noteCloseBtn">&times;</button>
+        <!-- ===== 下方可滚动调整面板 ===== -->
+        <div class="advanced-panel" id="advancedPanel">
+            <div class="adv-group">
+                <div class="adv-group-title">图层管理</div>
+                <div class="layer-list" id="layerList"></div>
+                <div class="layer-controls">
+                    <div class="adv-row">
+                        <label>X</label>
+                        <input type="number" id="layerX" value="0" step="1" style="width:70px;" />
+                        <label>Y</label>
+                        <input type="number" id="layerY" value="0" step="1" style="width:70px;" />
+                        <label>旋转</label>
+                        <input type="number" id="layerRotation" value="0" step="1" min="0" max="360" style="width:60px;" />
+                        <label>°</label>
+                        <button class="adv-btn" id="applyLayerPos">应用</button>
+                        <button class="adv-btn danger" id="deleteSelectedLayer">删除</button>
+                    </div>
+                    <div class="adv-row">
+                        <label>大小</label>
+                        <input type="range" id="layerScaleSlider" min="10" max="200" value="100" step="1" style="flex:1; min-width:80px;" />
+                        <span class="value-label" id="layerScaleVal">100%</span>
+                    </div>
+                </div>
             </div>
-            <div class="note-display" id="noteDisplay"></div>
-            <div class="note-modal-footer">
-                <span class="note-footer-hint">📌 内容只读 · 不可编辑</span>
-                <button class="note-btn-close" id="noteCloseBtn2">✕ 关闭</button>
+
+            <div class="adv-group">
+                <div class="adv-group-title">图层滤镜</div>
+                <div class="adv-row">
+                    <label>亮度</label>
+                    <input type="range" id="brightnessSlider" min="0" max="200" value="100" />
+                    <span class="value-label" id="brightnessVal">100%</span>
+                </div>
+                <div class="adv-row">
+                    <label>对比度</label>
+                    <input type="range" id="contrastSlider" min="0" max="200" value="100" />
+                    <span class="value-label" id="contrastVal">100%</span>
+                </div>
+                <div class="adv-row">
+                    <label>饱和度</label>
+                    <input type="range" id="saturationSlider" min="0" max="200" value="100" />
+                    <span class="value-label" id="saturationVal">100%</span>
+                </div>
+                <div class="adv-row">
+                    <label>色相</label>
+                    <input type="range" id="hueSlider" min="0" max="360" value="0" />
+                    <span class="value-label" id="hueVal">0°</span>
+                </div>
+                <div class="adv-row">
+                    <button class="adv-btn danger" id="resetLayerFilters">重置滤镜</button>
+                </div>
+            </div>
+
+            <div class="adv-group">
+                <div class="adv-group-title">✂️ 裁剪</div>
+                <div class="adv-row">
+                    <label>比例</label>
+                    <input type="number" id="cropRatioW" value="16" style="width:60px;" min="1" step="1" />
+                    <span style="color:#4a5a72;">:</span>
+                    <input type="number" id="cropRatioH" value="9" style="width:60px;" min="1" step="1" />
+                    <button class="adv-btn primary" id="cropApplyBtn" style="padding:6px 20px;">裁剪</button>
+                </div>
+                <div class="adv-row" style="gap:6px; flex-wrap:wrap;">
+                    <label style="min-width:40px;">预设</label>
+                    <button class="adv-btn crop-preset" data-w="1" data-h="1">1:1</button>
+                    <button class="adv-btn crop-preset" data-w="4" data-h="3">4:3</button>
+                    <button class="adv-btn crop-preset" data-w="16" data-h="9">16:9</button>
+                    <button class="adv-btn crop-preset" data-w="3" data-h="2">3:2</button>
+                    <button class="adv-btn crop-preset" data-w="21" data-h="9">21:9</button>
+                </div>
+                <div class="adv-row" style="flex-wrap:wrap; gap:6px; margin-top:4px;">
+                    <label style="min-width:40px;">图层</label>
+                    <div id="cropLayerCheckboxes" style="display:flex; flex-wrap:wrap; gap:4px 10px; flex:1;"></div>
+                    <button class="adv-btn" id="cropSelectAll" style="font-size:12px; padding:4px 12px;">全选</button>
+                    <button class="adv-btn" id="cropSelectNone" style="font-size:12px; padding:4px 12px;">取消</button>
+                </div>
+                <div style="font-size:12px; color:#8a9ab0; margin-top:2px;">⚠️ 裁剪后不可恢复，请谨慎操作</div>
+            </div>
+
+            <div class="adv-group">
+                <div class="adv-group-title">取色与擦除</div>
+                <div class="tool-group">
+                    <button class="adv-btn" id="colorPickToggle">🎨 取色模式</button>
+                    <button class="adv-btn" id="eraseModeToggle">🖍️ 擦除模式</button>
+                    <div class="erase-tool">
+                        <label>画笔大小</label>
+                        <input type="range" id="brushSizeSlider" min="1" max="1000" value="20" />
+                        <span class="size-val" id="brushSizeVal">20</span>
+                        <label>px</label>
+                        <button class="adv-btn danger" id="clearErasure">清除擦除</button>
+                    </div>
+                </div>
             </div>
         </div>
+        <!-- ===== 调整面板结束 ===== -->
+
+        <div style="margin-top:10px; font-size:12px; color:#aab4c6; text-align:center;">滚轮缩放 · 拖拽平移 · 点击选中图层</div>
     </div>
 
     <script>
-        // ============================================================
-        //  1. 工具箱数据渲染（与原来一致）
-        // ============================================================
-        const tools = [{
-            name: '拼豆图纸像素化',
-            description: '图片转像素图纸，支持坐标轴与颜色精度',
-            icon: '',
-            path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/tmtx.html'
-        }, {
-            name: '透明图像生成',
-            description: '为图片添加圆角矩形阴影，输出透明PNG',
-            icon: '',
-            path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/scpdtz.html'
-        }, {
-            name: '图像处理',
-            description: '对多个图像进行角度,大小,色相调整,取色,擦除',
-            icon: '',
-            path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/ystq&gszh.html'
-        }];
-
-        const grid = document.getElementById('toolGrid');
-        const countEl = document.getElementById('toolCount');
-
-        function escapeHtml(text) {
-            const d = document.createElement('div');
-            d.textContent = text;
-            return d.innerHTML;
-        }
-
-        function render() {
-            countEl.textContent = tools.length;
-            if (tools.length === 0) {
-                grid.innerHTML = `<div class="empty-state"><i class="fas fa-cube"></i></div>`;
-                return;
-            }
-            let html = '';
-            tools.forEach(t => {
-                const desc = t.description || '点击打开';
-                const isFa = t.icon && t.icon.startsWith('fa-');
-                const iconHtml = isFa ?
-                    `<i class="fas ${t.icon}"></i>` :
-                    `<span style="font-size:2.2rem;">${t.icon || '🔧'}</span>`;
-                const safePath = t.path.replace(/"/g, '&quot;');
-                html += `
-                        <div class="tool-card" data-path="${safePath}" role="button" tabindex="0">
-                            <div class="tool-icon">${iconHtml}</div>
-                            <div class="tool-name">${escapeHtml(t.name)}</div>
-                            <div class="tool-desc">${escapeHtml(desc)}</div>
-                            <div class="card-footer">打开 <i class="fas fa-arrow-right"></i></div>
-                        </div>
-                    `;
-            });
-            grid.innerHTML = html;
-        }
-
-        // 卡片点击打开新窗口
-        grid.addEventListener('click', (e) => {
-            const card = e.target.closest('.tool-card');
-            if (!card) return;
-            const path = card.getAttribute('data-path');
-            if (path) window.open(path, '_blank');
-        });
-
-        render();
-
-        // ============================================================
-        //  2. 隐藏记事本功能（点击标题5次触发密码）
-        // ============================================================
         (function() {
             'use strict';
 
-            // ---- DOM 引用 ----
-            const header = document.getElementById('headerTrigger');
-            const passwordOverlay = document.getElementById('passwordOverlay');
-            const noteOverlay = document.getElementById('noteOverlay');
-            const passwordInput = document.getElementById('passwordInput');
-            const pwdError = document.getElementById('pwdError');
-            const pwdConfirmBtn = document.getElementById('pwdConfirmBtn');
-            const pwdCancelBtn = document.getElementById('pwdCancelBtn');
-            const noteDisplay = document.getElementById('noteDisplay');
-            const noteCloseBtn = document.getElementById('noteCloseBtn');
-            const noteCloseBtn2 = document.getElementById('noteCloseBtn2');
+            // ========== DOM 引用 ==========
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            const canvas = document.getElementById('imageCanvas');
+            const ctx = canvas.getContext('2d');
+            const overlayCanvas = document.getElementById('overlayCanvas');
+            const overlayCtx = overlayCanvas.getContext('2d');
+            const zoomIndicator = document.getElementById('zoomIndicator');
+            const hintMsg = document.getElementById('hintMsg');
 
-            const CORRECT_PASSWORD = '1234566678';
-            let clickCount = 0;
-            let clickTimer = null;
+            const colorSwatch = document.getElementById('colorSwatch');
+            const hexDisplay = document.getElementById('hexDisplay');
+            const vHex = document.getElementById('vHex');
+            const vRgb = document.getElementById('vRgb');
+            const vHsl = document.getElementById('vHsl');
+            const vHsv = document.getElementById('vHsv');
+            const vCmyk = document.getElementById('vCmyk');
 
-            // ---- 获取笔记内容 ----
-            function getNoteContent() {
-                const source = document.getElementById('noteSource');
-                return source ? (source.textContent || source.innerText || '') :
-                    '📝 暂无笔记内容，请在 HTML 中编辑 noteSource。';
+            const exportBtns = document.querySelectorAll('.export-btn');
+
+            const layerList = document.getElementById('layerList');
+            const layerX = document.getElementById('layerX');
+            const layerY = document.getElementById('layerY');
+            const layerRotation = document.getElementById('layerRotation');
+            const layerScaleSlider = document.getElementById('layerScaleSlider');
+            const layerScaleVal = document.getElementById('layerScaleVal');
+            const applyLayerPos = document.getElementById('applyLayerPos');
+            const deleteSelectedBtn = document.getElementById('deleteSelectedLayer');
+
+            const brightnessSlider = document.getElementById('brightnessSlider');
+            const contrastSlider = document.getElementById('contrastSlider');
+            const saturationSlider = document.getElementById('saturationSlider');
+            const hueSlider = document.getElementById('hueSlider');
+            const brightnessVal = document.getElementById('brightnessVal');
+            const contrastVal = document.getElementById('contrastVal');
+            const saturationVal = document.getElementById('saturationVal');
+            const hueVal = document.getElementById('hueVal');
+            const resetLayerFilters = document.getElementById('resetLayerFilters');
+
+            const colorPickToggle = document.getElementById('colorPickToggle');
+            const eraseModeToggle = document.getElementById('eraseModeToggle');
+            const brushSizeSlider = document.getElementById('brushSizeSlider');
+            const brushSizeVal = document.getElementById('brushSizeVal');
+            const clearErasure = document.getElementById('clearErasure');
+
+            // ========== 裁剪 DOM ==========
+            const cropRatioW = document.getElementById('cropRatioW');
+            const cropRatioH = document.getElementById('cropRatioH');
+            const cropApplyBtn = document.getElementById('cropApplyBtn');
+            const cropLayerCheckboxes = document.getElementById('cropLayerCheckboxes');
+            const cropSelectAll = document.getElementById('cropSelectAll');
+            const cropSelectNone = document.getElementById('cropSelectNone');
+            const cropPresetBtns = document.querySelectorAll('.crop-preset');
+
+            // ========== 状态 ==========
+            let layers = [];
+            let selectedLayerId = null;
+            let nextId = 1;
+
+            let viewTransform = { scale: 1, offsetX: 0, offsetY: 0 };
+
+            let colorPickMode = false;
+            let eraseMode = false;
+            let brushSize = 20;
+            let isErasing = false;
+
+            let isDraggingView = false;
+            let dragStartX = 0,
+                dragStartY = 0;
+            let dragStartOffsetX = 0,
+                dragStartOffsetY = 0;
+
+            let isDraggingLayer = false;
+            let dragLayerStartX = 0,
+                dragLayerStartY = 0;
+            let dragLayerOrigX = 0,
+                dragLayerOrigY = 0;
+            let draggedLayerId = null;
+
+            let isPinching = false;
+            let pinchStartDist = 0;
+            let pinchStartScale = 1;
+            let pinchStartOffsetX = 0,
+                pinchStartOffsetY = 0;
+            let pinchCenterX = 0,
+                pinchCenterY = 0;
+
+            let lastErasePoint = null;
+
+            // ========== 颜色转换 ==========
+            function componentToHex(c) { const hex = c.toString(16); return hex.length === 1 ? '0' + hex : hex; }
+
+            function rgbToHex(r, g, b) { return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b); }
+
+            function rgbToHsl(r, g, b) {
+                r /= 255;
+                g /= 255;
+                b /= 255;
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                let h, s, l = (max + min) / 2;
+                if (max === min) { h = s = 0; } else {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r:
+                            h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+                            break;
+                        case g:
+                            h = ((b - r) / d + 2) / 6;
+                            break;
+                        case b:
+                            h = ((r - g) / d + 4) / 6;
+                            break;
+                    }
+                }
+                return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
             }
 
-            // ---- 密码弹窗 ----
-            function openPasswordDialog() {
-                passwordOverlay.classList.add('active');
-                passwordInput.value = '';
-                pwdError.textContent = '';
-                setTimeout(() => passwordInput.focus(), 100);
+            function rgbToHsv(r, g, b) {
+                r /= 255;
+                g /= 255;
+                b /= 255;
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                const d = max - min;
+                let h = 0,
+                    s = 0,
+                    v = max;
+                if (d !== 0) {
+                    s = d / max;
+                    switch (max) {
+                        case r:
+                            h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+                            break;
+                        case g:
+                            h = ((b - r) / d + 2) / 6;
+                            break;
+                        case b:
+                            h = ((r - g) / d + 4) / 6;
+                            break;
+                    }
+                }
+                return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
             }
 
-            function closePasswordDialog() {
-                passwordOverlay.classList.remove('active');
-                passwordInput.value = '';
-                pwdError.textContent = '';
+            function rgbToCmyk(r, g, b) {
+                const cr = 1 - (r / 255);
+                const cg = 1 - (g / 255);
+                const cb = 1 - (b / 255);
+                const k = Math.min(cr, cg, cb);
+                if (k === 1) return { c: 0, m: 0, y: 0, k: 100 };
+                const c = Math.round(((cr - k) / (1 - k)) * 100);
+                const m = Math.round(((cg - k) / (1 - k)) * 100);
+                const y = Math.round(((cb - k) / (1 - k)) * 100);
+                const kk = Math.round(k * 100);
+                return { c, m, y, k: kk };
             }
 
-            // ---- 记事本弹窗 ----
-            function openNote() {
-                noteDisplay.textContent = getNoteContent();
-                noteOverlay.classList.add('active');
-                noteDisplay.scrollTop = 0;
+            // ========== 图层核心 ==========
+
+            function createLayer(imageObj, name) {
+                const id = nextId++;
+                const layerCanvas = document.createElement('canvas');
+                layerCanvas.width = imageObj.width;
+                layerCanvas.height = imageObj.height;
+                const lCtx = layerCanvas.getContext('2d');
+                lCtx.imageSmoothingEnabled = true;
+                lCtx.drawImage(imageObj, 0, 0);
+
+                const cx = (canvas.width - imageObj.width) / 2;
+                const cy = (canvas.height - imageObj.height) / 2;
+
+                const layer = {
+                    id: id,
+                    canvas: layerCanvas,
+                    x: cx,
+                    y: cy,
+                    rotation: 0,
+                    scale: 1,
+                    visible: true,
+                    filters: { brightness: 100, contrast: 100, saturation: 100, hue: 0 },
+                    name: name || `图层 ${id}`,
+                    image: imageObj
+                };
+                layers.push(layer);
+                selectLayer(id);
+                renderAll();
+                updateLayerList();
+                return id;
             }
 
-            function closeNote() {
-                noteOverlay.classList.remove('active');
+            function deleteLayer(id) {
+                const idx = layers.findIndex(l => l.id === id);
+                if (idx === -1) return;
+                layers.splice(idx, 1);
+                if (selectedLayerId === id) {
+                    selectedLayerId = layers.length > 0 ? layers[0].id : null;
+                }
+                renderAll();
+                updateLayerList();
+                updateControls();
             }
 
-            // ---- 密码验证 ----
-            function verifyPassword() {
-                const input = passwordInput.value.trim();
-                if (input === CORRECT_PASSWORD) {
-                    closePasswordDialog();
-                    openNote();
+            function selectLayer(id) {
+                selectedLayerId = id;
+                updateLayerList();
+                updateControls();
+                const layer = getSelectedLayer();
+                if (layer) {
+                    layerX.value = layer.x;
+                    layerY.value = layer.y;
+                    layerRotation.value = layer.rotation;
+                    layerScaleSlider.value = Math.round(layer.scale * 100);
+                    layerScaleVal.textContent = Math.round(layer.scale * 100) + '%';
+                    brightnessSlider.value = layer.filters.brightness;
+                    contrastSlider.value = layer.filters.contrast;
+                    saturationSlider.value = layer.filters.saturation;
+                    hueSlider.value = layer.filters.hue;
+                    brightnessVal.textContent = layer.filters.brightness + '%';
+                    contrastVal.textContent = layer.filters.contrast + '%';
+                    saturationVal.textContent = layer.filters.saturation + '%';
+                    hueVal.textContent = layer.filters.hue + '°';
+                    hintMsg.textContent = '💡 已选中图层: ' + layer.name;
                 } else {
-                    pwdError.textContent = '❌ 密码错误，请重试';
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                    passwordInput.style.animation = 'none';
-                    requestAnimationFrame(() => {
-                        passwordInput.style.animation = 'shake 0.4s ease';
-                    });
+                    hintMsg.textContent = '💡 选中图层才可对图层进行操作';
                 }
             }
 
-            // ============================================================
-            //  事件绑定
-            // ============================================================
+            function getSelectedLayer() {
+                return layers.find(l => l.id === selectedLayerId) || null;
+            }
 
-            // ---- 标题点击计数（无任何提示） ----
-            header.addEventListener('click', function(e) {
-                clickCount++;
-                clearTimeout(clickTimer);
-                clickTimer = setTimeout(() => {
-                    clickCount = 0;
-                }, 800); // 800ms内连击有效
+            // ===== 图层排序 =====
+            function moveUpInArray(id) {
+                const idx = layers.findIndex(l => l.id === id);
+                if (idx <= 0) return;
+                [layers[idx], layers[idx - 1]] = [layers[idx - 1], layers[idx]];
+                renderAll();
+                updateLayerList();
+                selectLayer(id);
+            }
 
-                if (clickCount >= 5) {
-                    clickCount = 0;
-                    clearTimeout(clickTimer);
-                    openPasswordDialog();
+            function moveDownInArray(id) {
+                const idx = layers.findIndex(l => l.id === id);
+                if (idx === -1 || idx === layers.length - 1) return;
+                [layers[idx], layers[idx + 1]] = [layers[idx + 1], layers[idx]];
+                renderAll();
+                updateLayerList();
+                selectLayer(id);
+            }
+
+            // 图层面板渲染
+            function updateLayerList() {
+                layerList.innerHTML = '';
+                for (let i = layers.length - 1; i >= 0; i--) {
+                    const layer = layers[i];
+                    const index = i;
+                    const div = document.createElement('div');
+                    div.className = 'layer-item' + (layer.id === selectedLayerId ? ' selected' : '');
+
+                    const thumb = document.createElement('canvas');
+                    thumb.className = 'thumb';
+                    thumb.width = 32;
+                    thumb.height = 32;
+                    const tCtx = thumb.getContext('2d');
+                    tCtx.imageSmoothingEnabled = true;
+                    tCtx.drawImage(layer.canvas, 0, 0, 32, 32);
+                    div.appendChild(thumb);
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'layer-name';
+                    nameSpan.textContent = layer.name;
+                    div.appendChild(nameSpan);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'layer-actions';
+
+                    const upBtn = document.createElement('button');
+                    upBtn.className = 'move-btn';
+                    upBtn.textContent = '▲';
+                    upBtn.title = '上移图层';
+                    upBtn.disabled = (index === layers.length - 1);
+                    upBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (!this.disabled) moveDownInArray(layer.id);
+                    });
+                    actions.appendChild(upBtn);
+
+                    const downBtn = document.createElement('button');
+                    downBtn.className = 'move-btn';
+                    downBtn.textContent = '▼';
+                    downBtn.title = '下移图层';
+                    downBtn.disabled = (index === 0);
+                    downBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (!this.disabled) moveUpInArray(layer.id);
+                    });
+                    actions.appendChild(downBtn);
+
+                    const visBtn = document.createElement('button');
+                    visBtn.className = 'vis-toggle';
+                    visBtn.textContent = layer.visible ? '👁️' : '👁️‍🗨️';
+                    visBtn.title = '切换可见性';
+                    visBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        layer.visible = !layer.visible;
+                        renderAll();
+                        updateLayerList();
+                    });
+                    actions.appendChild(visBtn);
+
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'del-btn';
+                    delBtn.textContent = '✕';
+                    delBtn.title = '删除图层';
+                    delBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        deleteLayer(layer.id);
+                    });
+                    actions.appendChild(delBtn);
+
+                    div.appendChild(actions);
+
+                    div.addEventListener('click', function() {
+                        selectLayer(layer.id);
+                    });
+
+                    layerList.appendChild(div);
                 }
-            });
-
-            // ---- 密码确认 ----
-            pwdConfirmBtn.addEventListener('click', verifyPassword);
-            passwordInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    verifyPassword();
+                const sel = getSelectedLayer();
+                if (sel) {
+                    layerX.value = sel.x;
+                    layerY.value = sel.y;
+                    layerRotation.value = sel.rotation;
+                    layerScaleSlider.value = Math.round(sel.scale * 100);
+                    layerScaleVal.textContent = Math.round(sel.scale * 100) + '%';
                 }
-            });
+            }
 
-            // ---- 密码取消 ----
-            pwdCancelBtn.addEventListener('click', closePasswordDialog);
-            passwordOverlay.addEventListener('click', function(e) {
-                if (e.target === this) closePasswordDialog();
-            });
+            function updateControls() {
+                const sel = getSelectedLayer();
+                const hasSel = !!sel;
+                layerX.disabled = !hasSel;
+                layerY.disabled = !hasSel;
+                layerRotation.disabled = !hasSel;
+                layerScaleSlider.disabled = !hasSel;
+                applyLayerPos.disabled = !hasSel;
+                deleteSelectedBtn.disabled = !hasSel;
+                brightnessSlider.disabled = !hasSel;
+                contrastSlider.disabled = !hasSel;
+                saturationSlider.disabled = !hasSel;
+                hueSlider.disabled = !hasSel;
+                resetLayerFilters.disabled = !hasSel;
+                brushSizeSlider.disabled = false;
+                clearErasure.disabled = !hasSel;
+                if (!hasSel) {
+                    brightnessSlider.value = 100;
+                    contrastSlider.value = 100;
+                    saturationSlider.value = 100;
+                    hueSlider.value = 0;
+                    brightnessVal.textContent = '100%';
+                    contrastVal.textContent = '100%';
+                    saturationVal.textContent = '100%';
+                    hueVal.textContent = '0°';
+                    layerX.value = '';
+                    layerY.value = '';
+                    layerRotation.value = '';
+                    layerScaleSlider.value = 100;
+                    layerScaleVal.textContent = '100%';
+                    hintMsg.textContent = '💡 选中图层才可对图层进行操作';
+                }
+            }
 
-            // ---- 关闭记事本 ----
-            noteCloseBtn.addEventListener('click', closeNote);
-            noteCloseBtn2.addEventListener('click', closeNote);
-            noteOverlay.addEventListener('click', function(e) {
-                if (e.target === this) closeNote();
-            });
+            // ========== 渲染 ==========
 
-            // ---- ESC 关闭弹窗（保留标准交互） ----
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    if (noteOverlay.classList.contains('active')) {
-                        closeNote();
-                    } else if (passwordOverlay.classList.contains('active')) {
-                        closePasswordDialog();
+            function renderAll() {
+                if (layers.length === 0) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    zoomIndicator.classList.remove('show');
+                    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                    return;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.save();
+                ctx.translate(viewTransform.offsetX, viewTransform.offsetY);
+                ctx.scale(viewTransform.scale, viewTransform.scale);
+
+                layers.forEach(layer => {
+                    if (!layer.visible) return;
+                    const lw = layer.canvas.width * layer.scale;
+                    const lh = layer.canvas.height * layer.scale;
+                    const cx = layer.x + layer.canvas.width / 2;
+                    const cy = layer.y + layer.canvas.height / 2;
+                    const angle = layer.rotation * Math.PI / 180;
+                    const f = layer.filters;
+                    const filterStr =
+                        `brightness(${f.brightness}%) contrast(${f.contrast}%) saturate(${f.saturation}%) hue-rotate(${f.hue}deg)`;
+
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(angle);
+                    ctx.filter = filterStr;
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.drawImage(layer.canvas, -lw / 2, -lh / 2, lw, lh);
+                    ctx.restore();
+                });
+
+                ctx.restore();
+
+                const percent = Math.round(viewTransform.scale * 100);
+                zoomIndicator.textContent = percent + '%';
+                zoomIndicator.classList.add('show');
+
+                overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            }
+
+            // ========== 擦除功能 ==========
+
+            function applyEraserAt(layer, x, y, size) {
+                const lctx = layer.canvas.getContext('2d');
+                lctx.imageSmoothingEnabled = true;
+                lctx.save();
+                lctx.globalCompositeOperation = 'destination-out';
+                lctx.beginPath();
+                lctx.arc(x, y, size / 2, 0, Math.PI * 2);
+                lctx.fill();
+                lctx.restore();
+            }
+
+            function eraseLine(layer, x1, y1, x2, y2, size) {
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 1) {
+                    applyEraserAt(layer, x1, y1, size);
+                    return;
+                }
+                const step = Math.max(1, size / 4);
+                const steps = Math.max(1, Math.ceil(dist / step));
+                for (let i = 0; i <= steps; i++) {
+                    const t = i / steps;
+                    const x = x1 + dx * t;
+                    const y = y1 + dy * t;
+                    applyEraserAt(layer, x, y, size);
+                }
+            }
+
+            function getLayerCoord(layer, clientX, clientY) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const cx = (clientX - rect.left) * scaleX;
+                const cy = (clientY - rect.top) * scaleY;
+
+                const worldX = (cx - viewTransform.offsetX) / viewTransform.scale;
+                const worldY = (cy - viewTransform.offsetY) / viewTransform.scale;
+
+                const lcx = layer.x + layer.canvas.width / 2;
+                const lcy = layer.y + layer.canvas.height / 2;
+
+                const dx = worldX - lcx;
+                const dy = worldY - lcy;
+
+                const angle = -layer.rotation * Math.PI / 180;
+                const cosA = Math.cos(angle);
+                const sinA = Math.sin(angle);
+                const localX = dx * cosA - dy * sinA + layer.canvas.width / 2;
+                const localY = dx * sinA + dy * cosA + layer.canvas.height / 2;
+
+                if (localX >= 0 && localX < layer.canvas.width &&
+                    localY >= 0 && localY < layer.canvas.height) {
+                    return { x: localX, y: localY };
+                }
+                return null;
+            }
+
+            // ========== 取色 ==========
+
+            function getColorFromCanvas(clientX, clientY) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const cx = (clientX - rect.left) * scaleX;
+                const cy = (clientY - rect.top) * scaleY;
+
+                try {
+                    const pixel = ctx.getImageData(Math.round(cx), Math.round(cy), 1, 1).data;
+                    const r = pixel[0],
+                        g = pixel[1],
+                        b = pixel[2];
+                    const hex = rgbToHex(r, g, b);
+                    const hsl = rgbToHsl(r, g, b);
+                    const hsv = rgbToHsv(r, g, b);
+                    const cmyk = rgbToCmyk(r, g, b);
+                    colorSwatch.style.background = hex;
+                    hexDisplay.textContent = hex.toUpperCase();
+                    vHex.textContent = hex.toUpperCase();
+                    vRgb.textContent = `${r}, ${g}, ${b}`;
+                    vHsl.textContent = `${hsl.h}°, ${hsl.s}%, ${hsl.l}%`;
+                    vHsv.textContent = `${hsv.h}°, ${hsv.s}%, ${hsv.v}%`;
+                    vCmyk.textContent = `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`;
+                } catch (_) {}
+            }
+
+            // ========== 导出 ==========
+
+            function exportImage(format) {
+                if (layers.length === 0) {
+                    alert('请先添加图层');
+                    return;
+                }
+
+                let globalMinX = Infinity,
+                    globalMinY = Infinity;
+                let globalMaxX = -Infinity,
+                    globalMaxY = -Infinity;
+                let hasAnyPixel = false;
+
+                layers.forEach(layer => {
+                    if (!layer.visible) return;
+                    const w = layer.canvas.width * layer.scale;
+                    const h = layer.canvas.height * layer.scale;
+                    const angle = layer.rotation * Math.PI / 180;
+                    const cos = Math.abs(Math.cos(angle));
+                    const sin = Math.abs(Math.sin(angle));
+                    const rotW = w * cos + h * sin;
+                    const rotH = w * sin + h * cos;
+                    const cx = layer.x + layer.canvas.width / 2;
+                    const cy = layer.y + layer.canvas.height / 2;
+                    const x1 = cx - rotW / 2;
+                    const y1 = cy - rotH / 2;
+                    const x2 = cx + rotW / 2;
+                    const y2 = cy + rotH / 2;
+                    if (x1 < globalMinX) globalMinX = x1;
+                    if (y1 < globalMinY) globalMinY = y1;
+                    if (x2 > globalMaxX) globalMaxX = x2;
+                    if (y2 > globalMaxY) globalMaxY = y2;
+                    hasAnyPixel = true;
+                });
+
+                if (!hasAnyPixel || !isFinite(globalMinX)) {
+                    alert('没有可见的图层内容');
+                    return;
+                }
+
+                const outW = Math.ceil(globalMaxX - globalMinX);
+                const outH = Math.ceil(globalMaxY - globalMinY);
+                if (outW < 1 || outH < 1) {
+                    alert('导出区域太小');
+                    return;
+                }
+
+                const outCanvas = document.createElement('canvas');
+                outCanvas.width = outW;
+                outCanvas.height = outH;
+                const outCtx = outCanvas.getContext('2d');
+                outCtx.imageSmoothingEnabled = true;
+                outCtx.imageSmoothingQuality = 'high';
+
+                if (format === 'jpg') {
+                    outCtx.fillStyle = '#FFFFFF';
+                    outCtx.fillRect(0, 0, outW, outH);
+                }
+
+                layers.forEach(layer => {
+                    if (!layer.visible) return;
+                    const lw = layer.canvas.width * layer.scale;
+                    const lh = layer.canvas.height * layer.scale;
+                    const cx = layer.x + layer.canvas.width / 2 - globalMinX;
+                    const cy = layer.y + layer.canvas.height / 2 - globalMinY;
+                    const angle = layer.rotation * Math.PI / 180;
+
+                    const f = layer.filters;
+                    const filterStr =
+                        `brightness(${f.brightness}%) contrast(${f.contrast}%) saturate(${f.saturation}%) hue-rotate(${f.hue}deg)`;
+
+                    outCtx.save();
+                    outCtx.translate(cx, cy);
+                    outCtx.rotate(angle);
+                    outCtx.filter = filterStr;
+                    outCtx.imageSmoothingEnabled = true;
+                    outCtx.drawImage(layer.canvas, -lw / 2, -lh / 2, lw, lh);
+                    outCtx.restore();
+                });
+
+                let mimeType = '',
+                    ext = '';
+                switch (format) {
+                    case 'png':
+                        mimeType = 'image/png';
+                        ext = 'png';
+                        break;
+                    case 'jpg':
+                        mimeType = 'image/jpeg';
+                        ext = 'jpg';
+                        break;
+                    case 'webp':
+                        mimeType = 'image/webp';
+                        ext = 'webp';
+                        break;
+                    case 'bmp':
+                        mimeType = 'image/bmp';
+                        ext = 'bmp';
+                        break;
+                    default:
+                        return;
+                }
+
+                try {
+                    outCanvas.toBlob(function(blob) {
+                        if (!blob) {
+                            const dataUrl = outCanvas.toDataURL(mimeType, 0.95);
+                            download(dataUrl, `image.${ext}`);
+                            return;
+                        }
+                        const url = URL.createObjectURL(blob);
+                        download(url, `image.${ext}`);
+                        setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    }, mimeType, 0.95);
+                } catch (_) {
+                    const dataUrl = outCanvas.toDataURL(mimeType, 0.95);
+                    download(dataUrl, `image.${ext}`);
+                }
+            }
+
+            function download(url, filename) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+
+            // ========== 模式切换 ==========
+
+            function setMode(mode) {
+                colorPickMode = (mode === 'color');
+                eraseMode = (mode === 'erase');
+                colorPickToggle.classList.toggle('active', colorPickMode);
+                eraseModeToggle.classList.toggle('active', eraseMode);
+                if (colorPickMode) {
+                    canvas.style.cursor = 'crosshair';
+                } else if (eraseMode) {
+                    canvas.style.cursor = 'none';
+                } else {
+                    canvas.style.cursor = 'default';
+                }
+                colorPickToggle.textContent = colorPickMode ? '🎨 取色中 (关闭)' : '🎨 取色模式';
+                eraseModeToggle.textContent = eraseMode ? '🖍️ 擦除中 (关闭)' : '🖍️ 擦除模式';
+                if (eraseMode) {
+                    overlayCanvas.style.display = 'block';
+                } else {
+                    overlayCanvas.style.display = 'none';
+                    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                }
+                lastErasePoint = null;
+            }
+
+            function updateEraseCursor(clientX, clientY) {
+                if (!eraseMode) return;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const cx = (clientX - rect.left) * scaleX;
+                const cy = (clientY - rect.top) * scaleY;
+                overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                const radius = brushSize / 2 * viewTransform.scale;
+                overlayCtx.beginPath();
+                overlayCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+                overlayCtx.strokeStyle = 'rgba(255,255,255,0.8)';
+                overlayCtx.lineWidth = 2;
+                overlayCtx.setLineDash([4, 4]);
+                overlayCtx.stroke();
+                overlayCtx.setLineDash([]);
+                overlayCtx.beginPath();
+                overlayCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+                overlayCtx.fillStyle = 'rgba(255,255,255,0.15)';
+                overlayCtx.fill();
+            }
+
+            // ========== 事件绑定 ==========
+
+            // --- 鼠标滚轮缩放 ---
+            canvas.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -1 : 1;
+                const factor = 1 + delta * 0.1;
+                const newScale = Math.min(Math.max(viewTransform.scale * factor, 0.1), 10);
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const mx = (e.clientX - rect.left) * scaleX;
+                const my = (e.clientY - rect.top) * scaleY;
+                const wx = (mx - viewTransform.offsetX) / viewTransform.scale;
+                const wy = (my - viewTransform.offsetY) / viewTransform.scale;
+                viewTransform.scale = newScale;
+                viewTransform.offsetX = mx - wx * newScale;
+                viewTransform.offsetY = my - wy * newScale;
+                renderAll();
+            }, { passive: false });
+
+            // --- 鼠标移动 ---
+            canvas.addEventListener('mousemove', function(e) {
+                if (eraseMode) {
+                    updateEraseCursor(e.clientX, e.clientY);
+                    if (isErasing) {
+                        const layer = getSelectedLayer();
+                        if (!layer) return;
+                        const coord = getLayerCoord(layer, e.clientX, e.clientY);
+                        if (coord) {
+                            if (lastErasePoint) {
+                                eraseLine(layer, lastErasePoint.x, lastErasePoint.y, coord.x, coord.y, brushSize);
+                            } else {
+                                applyEraserAt(layer, coord.x, coord.y, brushSize);
+                            }
+                            lastErasePoint = coord;
+                            renderAll();
+                            updateLayerList();
+                        }
                     }
                 }
             });
 
-            // 静默启动，无控制台输出
+            canvas.addEventListener('mouseleave', function() {
+                if (eraseMode) {
+                    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                }
+                lastErasePoint = null;
+            });
+
+            // --- 鼠标按下 ---
+            canvas.addEventListener('mousedown', function(e) {
+                if (colorPickMode) {
+                    getColorFromCanvas(e.clientX, e.clientY);
+                    return;
+                }
+                if (eraseMode) {
+                    const layer = getSelectedLayer();
+                    if (!layer) return;
+                    const coord = getLayerCoord(layer, e.clientX, e.clientY);
+                    if (coord) {
+                        applyEraserAt(layer, coord.x, coord.y, brushSize);
+                        lastErasePoint = coord;
+                        renderAll();
+                        updateLayerList();
+                        isErasing = true;
+                    }
+                    return;
+                }
+
+                const layer = getSelectedLayer();
+                if (!layer) {
+                    isDraggingView = true;
+                    dragStartX = e.clientX;
+                    dragStartY = e.clientY;
+                    dragStartOffsetX = viewTransform.offsetX;
+                    dragStartOffsetY = viewTransform.offsetY;
+                    canvas.style.cursor = 'grabbing';
+                    return;
+                }
+                const coord = getLayerCoord(layer, e.clientX, e.clientY);
+                if (coord) {
+                    isDraggingLayer = true;
+                    draggedLayerId = layer.id;
+                    dragLayerStartX = e.clientX;
+                    dragLayerStartY = e.clientY;
+                    dragLayerOrigX = layer.x;
+                    dragLayerOrigY = layer.y;
+                    canvas.style.cursor = 'move';
+                } else {
+                    isDraggingView = true;
+                    dragStartX = e.clientX;
+                    dragStartY = e.clientY;
+                    dragStartOffsetX = viewTransform.offsetX;
+                    dragStartOffsetY = viewTransform.offsetY;
+                    canvas.style.cursor = 'grabbing';
+                }
+            });
+
+            window.addEventListener('mousemove', function(e) {
+                if (isDraggingView) {
+                    const dx = e.clientX - dragStartX;
+                    const dy = e.clientY - dragStartY;
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+                    viewTransform.offsetX = dragStartOffsetX + dx * scaleX;
+                    viewTransform.offsetY = dragStartOffsetY + dy * scaleY;
+                    renderAll();
+                } else if (isDraggingLayer) {
+                    const dx = e.clientX - dragLayerStartX;
+                    const dy = e.clientY - dragLayerStartY;
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+                    const deltaX = dx * scaleX / viewTransform.scale;
+                    const deltaY = dy * scaleY / viewTransform.scale;
+                    const layer = layers.find(l => l.id === draggedLayerId);
+                    if (layer) {
+                        layer.x = dragLayerOrigX + deltaX;
+                        layer.y = dragLayerOrigY + deltaY;
+                        renderAll();
+                        updateLayerList();
+                        layerX.value = layer.x;
+                        layerY.value = layer.y;
+                    }
+                }
+            });
+
+            window.addEventListener('mouseup', function() {
+                if (isDraggingView || isDraggingLayer) {
+                    isDraggingView = false;
+                    isDraggingLayer = false;
+                    draggedLayerId = null;
+                    canvas.style.cursor = 'default';
+                }
+                if (isErasing) {
+                    isErasing = false;
+                    lastErasePoint = null;
+                }
+            });
+
+            // --- 触摸事件 ---
+
+            let touchId = null;
+
+            canvas.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const touches = e.touches;
+
+                if (touches.length === 2) {
+                    isDraggingView = false;
+                    isDraggingLayer = false;
+                    isErasing = false;
+                    lastErasePoint = null;
+
+                    const t1 = touches[0],
+                        t2 = touches[1];
+                    const dx = t1.clientX - t2.clientX;
+                    const dy = t1.clientY - t2.clientY;
+                    pinchStartDist = Math.sqrt(dx * dx + dy * dy);
+                    pinchStartScale = viewTransform.scale;
+                    pinchStartOffsetX = viewTransform.offsetX;
+                    pinchStartOffsetY = viewTransform.offsetY;
+                    pinchCenterX = (t1.clientX + t2.clientX) / 2;
+                    pinchCenterY = (t1.clientY + t2.clientY) / 2;
+                    isPinching = true;
+                    return;
+                }
+
+                if (touches.length === 1) {
+                    const touch = touches[0];
+                    const clientX = touch.clientX,
+                        clientY = touch.clientY;
+
+                    if (colorPickMode) {
+                        getColorFromCanvas(clientX, clientY);
+                        return;
+                    }
+
+                    if (eraseMode) {
+                        const layer = getSelectedLayer();
+                        if (!layer) return;
+                        const coord = getLayerCoord(layer, clientX, clientY);
+                        if (coord) {
+                            applyEraserAt(layer, coord.x, coord.y, brushSize);
+                            lastErasePoint = coord;
+                            renderAll();
+                            updateLayerList();
+                            isErasing = true;
+                            touchId = touch.identifier;
+                        }
+                        return;
+                    }
+
+                    const layer = getSelectedLayer();
+                    if (!layer) {
+                        isDraggingView = true;
+                        dragStartX = clientX;
+                        dragStartY = clientY;
+                        dragStartOffsetX = viewTransform.offsetX;
+                        dragStartOffsetY = viewTransform.offsetY;
+                        return;
+                    }
+                    const coord = getLayerCoord(layer, clientX, clientY);
+                    if (coord) {
+                        isDraggingLayer = true;
+                        draggedLayerId = layer.id;
+                        dragLayerStartX = clientX;
+                        dragLayerStartY = clientY;
+                        dragLayerOrigX = layer.x;
+                        dragLayerOrigY = layer.y;
+                    } else {
+                        isDraggingView = true;
+                        dragStartX = clientX;
+                        dragStartY = clientY;
+                        dragStartOffsetX = viewTransform.offsetX;
+                        dragStartOffsetY = viewTransform.offsetY;
+                    }
+                }
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const touches = e.touches;
+
+                if (touches.length === 2 && isPinching) {
+                    const t1 = touches[0],
+                        t2 = touches[1];
+                    const dx = t1.clientX - t2.clientX;
+                    const dy = t1.clientY - t2.clientY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const scaleFactor = dist / pinchStartDist;
+                    let newScale = Math.min(Math.max(pinchStartScale * scaleFactor, 0.1), 10);
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+                    const mx = (pinchCenterX - rect.left) * scaleX;
+                    const my = (pinchCenterY - rect.top) * scaleY;
+                    const wx = (mx - pinchStartOffsetX) / pinchStartScale;
+                    const wy = (my - pinchStartOffsetY) / pinchStartScale;
+                    viewTransform.scale = newScale;
+                    viewTransform.offsetX = mx - wx * newScale;
+                    viewTransform.offsetY = my - wy * newScale;
+                    renderAll();
+                    return;
+                }
+
+                if (eraseMode && isErasing && touches.length === 1) {
+                    const touch = touches[0];
+                    if (touch.identifier === touchId) {
+                        const layer = getSelectedLayer();
+                        if (!layer) return;
+                        const coord = getLayerCoord(layer, touch.clientX, touch.clientY);
+                        if (coord) {
+                            if (lastErasePoint) {
+                                eraseLine(layer, lastErasePoint.x, lastErasePoint.y, coord.x, coord.y, brushSize);
+                            } else {
+                                applyEraserAt(layer, coord.x, coord.y, brushSize);
+                            }
+                            lastErasePoint = coord;
+                            renderAll();
+                            updateLayerList();
+                        }
+                    }
+                    return;
+                }
+
+                if (touches.length === 1) {
+                    const touch = touches[0];
+                    const clientX = touch.clientX,
+                        clientY = touch.clientY;
+                    if (isDraggingView) {
+                        const dx = clientX - dragStartX;
+                        const dy = clientY - dragStartY;
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        viewTransform.offsetX = dragStartOffsetX + dx * scaleX;
+                        viewTransform.offsetY = dragStartOffsetY + dy * scaleY;
+                        renderAll();
+                    } else if (isDraggingLayer) {
+                        const dx = clientX - dragLayerStartX;
+                        const dy = clientY - dragLayerStartY;
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        const deltaX = dx * scaleX / viewTransform.scale;
+                        const deltaY = dy * scaleY / viewTransform.scale;
+                        const layer = layers.find(l => l.id === draggedLayerId);
+                        if (layer) {
+                            layer.x = dragLayerOrigX + deltaX;
+                            layer.y = dragLayerOrigY + deltaY;
+                            renderAll();
+                            updateLayerList();
+                            layerX.value = layer.x;
+                            layerY.value = layer.y;
+                        }
+                    }
+                }
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                if (isErasing) {
+                    isErasing = false;
+                    lastErasePoint = null;
+                    touchId = null;
+                }
+                if (isDraggingView || isDraggingLayer) {
+                    isDraggingView = false;
+                    isDraggingLayer = false;
+                    draggedLayerId = null;
+                }
+                if (isPinching) {
+                    isPinching = false;
+                }
+                if (e.touches.length === 0) {
+                    isDraggingView = false;
+                    isDraggingLayer = false;
+                    isErasing = false;
+                    touchId = null;
+                    lastErasePoint = null;
+                }
+            }, { passive: false });
+
+            canvas.addEventListener('touchcancel', function(e) {
+                e.preventDefault();
+                isDraggingView = false;
+                isDraggingLayer = false;
+                isErasing = false;
+                touchId = null;
+                lastErasePoint = null;
+                isPinching = false;
+            }, { passive: false });
+
+            // ========== 其他事件 ==========
+
+            fileInput.addEventListener('change', function(e) {
+                const files = this.files;
+                if (!files || files.length === 0) return;
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (!file.type.startsWith('image/')) continue;
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const name = file.name || `图层 ${nextId}`;
+                            createLayer(img, name);
+                        };
+                        img.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+                this.value = '';
+            });
+
+            uploadArea.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'LABEL' && !e.target.closest('label')) {
+                    fileInput.click();
+                }
+            });
+
+            applyLayerPos.addEventListener('click', function() {
+                const layer = getSelectedLayer();
+                if (!layer) return;
+                const x = parseInt(layerX.value);
+                const y = parseInt(layerY.value);
+                const rot = parseFloat(layerRotation.value) || 0;
+                if (isNaN(x) || isNaN(y)) return;
+                layer.x = x;
+                layer.y = y;
+                layer.rotation = rot;
+                renderAll();
+                updateLayerList();
+            });
+
+            layerRotation.addEventListener('input', function() {
+                const layer = getSelectedLayer();
+                if (!layer) return;
+                const rot = parseFloat(this.value) || 0;
+                layer.rotation = rot;
+                renderAll();
+                updateLayerList();
+            });
+
+            layerScaleSlider.addEventListener('input', function() {
+                const layer = getSelectedLayer();
+                if (!layer) return;
+                const val = parseInt(this.value) / 100;
+                layer.scale = val;
+                layerScaleVal.textContent = Math.round(val * 100) + '%';
+                renderAll();
+                updateLayerList();
+            });
+
+            deleteSelectedBtn.addEventListener('click', function() {
+                if (selectedLayerId === null) return;
+                deleteLayer(selectedLayerId);
+            });
+
+            function updateLayerFilters() {
+                const layer = getSelectedLayer();
+                if (!layer) return;
+                layer.filters.brightness = parseInt(brightnessSlider.value);
+                layer.filters.contrast = parseInt(contrastSlider.value);
+                layer.filters.saturation = parseInt(saturationSlider.value);
+                layer.filters.hue = parseInt(hueSlider.value);
+                brightnessVal.textContent = layer.filters.brightness + '%';
+                contrastVal.textContent = layer.filters.contrast + '%';
+                saturationVal.textContent = layer.filters.saturation + '%';
+                hueVal.textContent = layer.filters.hue + '°';
+                renderAll();
+                updateLayerList();
+            }
+
+            brightnessSlider.addEventListener('input', updateLayerFilters);
+            contrastSlider.addEventListener('input', updateLayerFilters);
+            saturationSlider.addEventListener('input', updateLayerFilters);
+            hueSlider.addEventListener('input', updateLayerFilters);
+
+            resetLayerFilters.addEventListener('click', function() {
+                const layer = getSelectedLayer();
+                if (!layer) return;
+                layer.filters = { brightness: 100, contrast: 100, saturation: 100, hue: 0 };
+                brightnessSlider.value = 100;
+                contrastSlider.value = 100;
+                saturationSlider.value = 100;
+                hueSlider.value = 0;
+                brightnessVal.textContent = '100%';
+                contrastVal.textContent = '100%';
+                saturationVal.textContent = '100%';
+                hueVal.textContent = '0°';
+                renderAll();
+                updateLayerList();
+            });
+
+            colorPickToggle.addEventListener('click', function() {
+                if (colorPickMode) setMode('select');
+                else {
+                    if (eraseMode) setMode('select');
+                    setMode('color');
+                }
+            });
+
+            eraseModeToggle.addEventListener('click', function() {
+                if (eraseMode) setMode('select');
+                else {
+                    if (colorPickMode) setMode('select');
+                    setMode('erase');
+                }
+            });
+
+            brushSizeSlider.addEventListener('input', function() {
+                brushSize = parseInt(this.value);
+                brushSizeVal.textContent = brushSize;
+                if (eraseMode) {
+                    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                }
+            });
+
+            clearErasure.addEventListener('click', function() {
+                const layer = getSelectedLayer();
+                if (!layer) return;
+                const lctx = layer.canvas.getContext('2d');
+                lctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
+                lctx.drawImage(layer.image, 0, 0);
+                renderAll();
+                updateLayerList();
+            });
+
+            exportBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const format = this.getAttribute('data-format');
+                    exportImage(format);
+                });
+            });
+
+            // ========== 裁剪功能 ==========
+
+            function updateCropLayerCheckboxes() {
+                cropLayerCheckboxes.innerHTML = '';
+                for (let i = layers.length - 1; i >= 0; i--) {
+                    const layer = layers[i];
+                    const label = document.createElement('label');
+                    label.style.cssText = 'display:flex; align-items:center; gap:4px; font-size:13px; color:#2c3e5a; cursor:pointer;';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.value = layer.id;
+                    cb.dataset.layerId = layer.id;
+                    if (layer.id === selectedLayerId) {
+                        cb.checked = true;
+                    }
+                    const span = document.createElement('span');
+                    span.textContent = layer.name;
+                    label.appendChild(cb);
+                    label.appendChild(span);
+                    cropLayerCheckboxes.appendChild(label);
+                }
+            }
+
+            function getCheckedLayerIds() {
+                const ids = [];
+                const cbs = cropLayerCheckboxes.querySelectorAll('input[type="checkbox"]:checked');
+                cbs.forEach(cb => {
+                    ids.push(parseInt(cb.dataset.layerId));
+                });
+                return ids;
+            }
+
+            function getCheckedLayers() {
+                const ids = getCheckedLayerIds();
+                return layers.filter(l => ids.includes(l.id));
+            }
+
+            function cropLayers(ratioW, ratioH) {
+                if (ratioW <= 0 || ratioH <= 0) {
+                    alert('请输入有效的宽高比（大于0）');
+                    return false;
+                }
+                const targetRatio = ratioW / ratioH;
+                const selectedLayers = getCheckedLayers();
+                if (selectedLayers.length === 0) {
+                    alert('请至少勾选一个要裁剪的图层');
+                    return false;
+                }
+
+                let croppedCount = 0;
+                selectedLayers.forEach(layer => {
+                    const w = layer.canvas.width;
+                    const h = layer.canvas.height;
+                    const currentRatio = w / h;
+
+                    if (Math.abs(currentRatio - targetRatio) < 0.0001) {
+                        return;
+                    }
+
+                    let newW, newH, sx, sy;
+                    if (targetRatio > currentRatio) {
+                        newH = h;
+                        newW = h * targetRatio;
+                        if (newW > w) {
+                            newW = w;
+                            newH = w / targetRatio;
+                            sx = 0;
+                            sy = (h - newH) / 2;
+                        } else {
+                            sx = (w - newW) / 2;
+                            sy = 0;
+                        }
+                    } else {
+                        newW = w;
+                        newH = w / targetRatio;
+                        if (newH > h) {
+                            newH = h;
+                            newW = h * targetRatio;
+                            sx = (w - newW) / 2;
+                            sy = 0;
+                        } else {
+                            sx = 0;
+                            sy = (h - newH) / 2;
+                        }
+                    }
+
+                    newW = Math.round(newW);
+                    newH = Math.round(newH);
+                    sx = Math.round(sx);
+                    sy = Math.round(sy);
+
+                    if (newW < 1 || newH < 1) {
+                        return;
+                    }
+
+                    const newCanvas = document.createElement('canvas');
+                    newCanvas.width = newW;
+                    newCanvas.height = newH;
+                    const newCtx = newCanvas.getContext('2d');
+                    newCtx.imageSmoothingEnabled = true;
+                    newCtx.imageSmoothingQuality = 'high';
+                    newCtx.drawImage(layer.canvas, sx, sy, newW, newH, 0, 0, newW, newH);
+
+                    layer.canvas = newCanvas;
+
+                    const imgCanvas = document.createElement('canvas');
+                    imgCanvas.width = newW;
+                    imgCanvas.height = newH;
+                    const imgCtx = imgCanvas.getContext('2d');
+                    imgCtx.imageSmoothingEnabled = true;
+                    imgCtx.drawImage(newCanvas, 0, 0);
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        layer.image = tempImg;
+                        renderAll();
+                        updateLayerList();
+                        updateCropLayerCheckboxes();
+                    };
+                    tempImg.src = imgCanvas.toDataURL('image/png');
+
+                    const oldW = w;
+                    const oldH = h;
+                    layer.x += (oldW - newW) / 2;
+                    layer.y += (oldH - newH) / 2;
+
+                    croppedCount++;
+                });
+
+                renderAll();
+                updateLayerList();
+                updateCropLayerCheckboxes();
+
+                if (croppedCount > 0) {
+                    hintMsg.textContent = '✅ 已裁剪 ' + croppedCount + ' 个图层';
+                } else {
+                    hintMsg.textContent = 'ℹ️ 没有图层被裁剪（比例可能已匹配）';
+                }
+                return true;
+            }
+
+            cropPresetBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const w = parseInt(this.dataset.w);
+                    const h = parseInt(this.dataset.h);
+                    cropRatioW.value = w;
+                    cropRatioH.value = h;
+                    updateCropLayerCheckboxes();
+                });
+            });
+
+            cropApplyBtn.addEventListener('click', function() {
+                const w = parseFloat(cropRatioW.value);
+                const h = parseFloat(cropRatioH.value);
+                updateCropLayerCheckboxes();
+                cropLayers(w, h);
+            });
+
+            cropSelectAll.addEventListener('click', function() {
+                const cbs = cropLayerCheckboxes.querySelectorAll('input[type="checkbox"]');
+                cbs.forEach(cb => cb.checked = true);
+            });
+
+            cropSelectNone.addEventListener('click', function() {
+                const cbs = cropLayerCheckboxes.querySelectorAll('input[type="checkbox"]');
+                cbs.forEach(cb => cb.checked = false);
+            });
+
+            const origUpdateLayerList = updateLayerList;
+            updateLayerList = function() {
+                origUpdateLayerList();
+                updateCropLayerCheckboxes();
+            };
+
+            const origSelectLayer = selectLayer;
+            selectLayer = function(id) {
+                origSelectLayer(id);
+                updateCropLayerCheckboxes();
+            };
+
+            updateCropLayerCheckboxes();
+
+            cropRatioW.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    cropApplyBtn.click();
+                }
+            });
+            cropRatioH.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    cropApplyBtn.click();
+                }
+            });
+
+            // ========== 初始化 ==========
+            canvas.width = 700;
+            canvas.height = 480;
+            canvas.style.width = '100%';
+            canvas.style.height = 'auto';
+            overlayCanvas.width = canvas.width;
+            overlayCanvas.height = canvas.height;
+            overlayCanvas.style.width = '100%';
+            overlayCanvas.style.height = '100%';
+            overlayCanvas.style.position = 'absolute';
+            overlayCanvas.style.top = '0';
+            overlayCanvas.style.left = '0';
+            overlayCanvas.style.pointerEvents = 'none';
+            overlayCanvas.style.display = 'none';
+
+            viewTransform.scale = 1;
+            viewTransform.offsetX = 0;
+            viewTransform.offsetY = 0;
+
+            setMode('select');
+            updateLayerList();
+            updateControls();
+
+            console.log('🖼️ 多图层编辑器 (画布已固定)');
         })();
     </script>
 
