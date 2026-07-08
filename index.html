@@ -553,6 +553,35 @@
             margin-top: 16px;
         }
 
+        /* ===== 右下角留言按钮 ===== */
+        .btn-message {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(102, 126, 234, 0.40);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+            z-index: 9997;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-message:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 36px rgba(102, 126, 234, 0.50);
+        }
+
+        .btn-message:active {
+            transform: scale(0.94);
+        }
+
         /* ===== 动画 ===== */
         @keyframes fadeIn {
             from {
@@ -624,6 +653,12 @@
                 text-align: center;
                 padding: 6px;
             }
+            .btn-message {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -651,6 +686,12 @@
             }
             .card-footer {
                 font-size: 0.7rem;
+            }
+            .btn-message {
+                bottom: 16px;
+                right: 16px;
+                padding: 10px 16px;
+                font-size: 13px;
             }
         }
 
@@ -694,13 +735,16 @@
 
     </div>
 
+    <!-- ===== 右下角留言按钮 ===== -->
+    <button class="btn-message" id="messageBtn">💬 留言</button>
+
     <!-- ============================================================
     📝 笔记内容定义（您在这里修改笔记！）
     下方 div#noteSource 中的文字就是所有访问者看到的笔记内容。
     修改后保存文件即可，无需任何其他操作。
     ============================================================ -->
     <div id="noteSource" style="display:none;">
-        写点什么呢\n 写什么他们都不知道啊\n 他们真的能猜到密码吗\n 算了，给你说密码是123吧\n 猜到密码的加我联系方式领取奖励
+        
     </div>
 
     <!-- ============================================================
@@ -827,7 +871,14 @@
         render();
 
         // ============================================================
-        //  2. 联系弹窗
+        //  2. 右下角留言按钮
+        // ============================================================
+        document.getElementById('messageBtn').addEventListener('click', function() {
+            window.open('https://wafyuyuyuwaf.github.io/jishiben/index.html', '_blank');
+        });
+
+        // ============================================================
+        //  3. 联系弹窗
         // ============================================================
         (function() {
             const contactBtn = document.getElementById('contactBtn');
@@ -895,7 +946,7 @@
         })();
 
         // ============================================================
-        //  3. 隐藏记事本功能（点击标题5次触发密码）
+        //  4. 隐藏记事本功能（点击标题5次触发密码）
         // ============================================================
         (function() {
             'use strict';
