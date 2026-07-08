@@ -27,7 +27,7 @@
             width: 100%;
         }
 
-        /* ===== 头部（点击触发密码） ===== */
+        /* ===== 头部 ===== */
         .header {
             display: flex;
             align-items: center;
@@ -37,15 +37,27 @@
             margin-bottom: 2rem;
             flex-wrap: wrap;
             gap: 0.8rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
             cursor: pointer;
             user-select: none;
         }
 
-        .header h1 {
+        .header-left h1 {
             font-size: 1.8rem;
             font-weight: 700;
             color: #1e293b;
             letter-spacing: -0.3px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
         }
 
         .badge {
@@ -60,6 +72,24 @@
         .badge span {
             font-weight: 700;
             color: #1e293b;
+        }
+
+        .btn-contact {
+            background: #eef2f7;
+            border: none;
+            padding: 0.25rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #475569;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-contact:hover {
+            background: #667eea;
+            color: #fff;
         }
 
         /* ===== 卡片列表（一行一个，紧凑） ===== */
@@ -408,6 +438,121 @@
             gap: 6px;
         }
 
+        /* ===== 联系弹窗 ===== */
+        .contact-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.50);
+            backdrop-filter: blur(6px);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .contact-overlay.active {
+            display: flex;
+        }
+
+        .contact-modal {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 36px 44px 32px;
+            max-width: 420px;
+            width: 92%;
+            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.30);
+            animation: slideUp 0.3s ease;
+        }
+
+        .contact-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .contact-modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .contact-modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0 4px;
+            transition: color 0.2s, transform 0.2s;
+            line-height: 1;
+        }
+
+        .contact-modal-close:hover {
+            color: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #eef2f7;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-item .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            min-width: 44px;
+        }
+
+        .contact-item .value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1e293b;
+            font-family: 'SF Mono', 'Menlo', monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-item .copy-btn {
+            margin-left: auto;
+            background: #eef2f7;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #475569;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .contact-item .copy-btn:hover {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .contact-copy-hint {
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: 16px;
+        }
+
         /* ===== 动画 ===== */
         @keyframes fadeIn {
             from {
@@ -453,7 +598,7 @@
             body {
                 padding: 1.2rem 1rem 2rem;
             }
-            .header h1 {
+            .header-left h1 {
                 font-size: 1.4rem;
             }
             .tool-card {
@@ -466,13 +611,30 @@
             .tool-desc {
                 font-size: 0.78rem;
             }
+            .contact-modal {
+                padding: 28px 24px 24px;
+            }
+            .contact-item {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .contact-item .copy-btn {
+                margin-left: 0;
+                width: 100%;
+                text-align: center;
+                padding: 6px;
+            }
         }
 
         @media (max-width: 480px) {
-            .header h1 {
+            .header-left h1 {
                 font-size: 1.2rem;
             }
             .badge {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.8rem;
+            }
+            .btn-contact {
                 font-size: 0.75rem;
                 padding: 0.2rem 0.8rem;
             }
@@ -514,10 +676,15 @@
 
     <div class="container">
 
-        <!-- ===== 头部（点击5次触发密码） ===== -->
-        <header class="header" id="headerTrigger">
-            <h1>工具箱</h1>
-            <span class="badge">共 <span id="toolCount">0</span> 个工具</span>
+        <!-- ===== 头部 ===== -->
+        <header class="header">
+            <div class="header-left" id="headerTrigger">
+                <h1>工具箱</h1>
+                <span class="badge">共 <span id="toolCount">0</span> 个工具</span>
+            </div>
+            <div class="header-right">
+                <button class="btn-contact" id="contactBtn">联系</button>
+            </div>
         </header>
 
         <!-- ===== 卡片网格 ===== -->
@@ -533,7 +700,7 @@
     修改后保存文件即可，无需任何其他操作。
     ============================================================ -->
     <div id="noteSource" style="display:none;">
-        
+        写点什么呢\n 写什么他们都不知道啊\n 他们真的能猜到密码吗\n 算了，给你说密码是123吧\n 猜到密码的加我联系方式领取奖励
     </div>
 
     <!-- ============================================================
@@ -543,7 +710,7 @@
         <div class="password-modal">
             <span class="lock-icon">🔒</span>
             <h2>输入密码</h2>
-            <p class="sub">微信请加beron_yuyuyu</p>
+            <p class="sub">请输入密码以查看隐藏记事本</p>
             <div class="password-input-group">
                 <input type="password" id="passwordInput" placeholder="请输入密码" maxlength="20" autocomplete="off" />
                 <div class="pwd-error" id="pwdError"></div>
@@ -570,6 +737,29 @@
                 <span class="note-footer-hint">📌 内容只读 · 不可编辑</span>
                 <button class="note-btn-close" id="noteCloseBtn2">✕ 关闭</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    📞 联系弹窗
+    ============================================================ -->
+    <div class="contact-overlay" id="contactOverlay">
+        <div class="contact-modal">
+            <div class="contact-modal-header">
+                <h2>📞 联系方式</h2>
+                <button class="contact-modal-close" id="contactCloseBtn">&times;</button>
+            </div>
+            <div class="contact-item">
+                <span class="label">微信</span>
+                <span class="value">beron_yuyuyu</span>
+                <button class="copy-btn" data-copy="beron_yuyuyu">复制</button>
+            </div>
+            <div class="contact-item">
+                <span class="label">QQ</span>
+                <span class="value">3586338672</span>
+                <button class="copy-btn" data-copy="3586338672">复制</button>
+            </div>
+            <div class="contact-copy-hint">点击「复制」可复制到剪贴板</div>
         </div>
     </div>
 
@@ -637,12 +827,79 @@
         render();
 
         // ============================================================
-        //  2. 隐藏记事本功能（点击标题5次触发密码）
+        //  2. 联系弹窗
+        // ============================================================
+        (function() {
+            const contactBtn = document.getElementById('contactBtn');
+            const contactOverlay = document.getElementById('contactOverlay');
+            const contactCloseBtn = document.getElementById('contactCloseBtn');
+
+            function openContact() {
+                contactOverlay.classList.add('active');
+            }
+
+            function closeContact() {
+                contactOverlay.classList.remove('active');
+            }
+
+            contactBtn.addEventListener('click', openContact);
+            contactCloseBtn.addEventListener('click', closeContact);
+            contactOverlay.addEventListener('click', function(e) {
+                if (e.target === this) closeContact();
+            });
+
+            // ESC 关闭
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && contactOverlay.classList.contains('active')) {
+                    closeContact();
+                }
+            });
+
+            // 复制功能
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const text = this.getAttribute('data-copy');
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            const orig = this.textContent;
+                            this.textContent = '✅ 已复制';
+                            setTimeout(() => { this.textContent = orig; }, 1500);
+                        }).catch(() => {
+                            fallbackCopy(text, this);
+                        });
+                    } else {
+                        fallbackCopy(text, this);
+                    }
+                });
+            });
+
+            function fallbackCopy(text, btn) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    const orig = btn.textContent;
+                    btn.textContent = '✅ 已复制';
+                    setTimeout(() => { btn.textContent = orig; }, 1500);
+                } catch (_) {
+                    alert('复制失败，请手动复制：' + text);
+                }
+                document.body.removeChild(textarea);
+            }
+        })();
+
+        // ============================================================
+        //  3. 隐藏记事本功能（点击标题5次触发密码）
         // ============================================================
         (function() {
             'use strict';
 
-            // ---- DOM 引用 ----
             const header = document.getElementById('headerTrigger');
             const passwordOverlay = document.getElementById('passwordOverlay');
             const noteOverlay = document.getElementById('noteOverlay');
@@ -658,14 +915,12 @@
             let clickCount = 0;
             let clickTimer = null;
 
-            // ---- 获取笔记内容 ----
             function getNoteContent() {
                 const source = document.getElementById('noteSource');
                 return source ? (source.textContent || source.innerText || '') :
                     '📝 暂无笔记内容，请在 HTML 中编辑 noteSource。';
             }
 
-            // ---- 密码弹窗 ----
             function openPasswordDialog() {
                 passwordOverlay.classList.add('active');
                 passwordInput.value = '';
@@ -679,7 +934,6 @@
                 pwdError.textContent = '';
             }
 
-            // ---- 记事本弹窗 ----
             function openNote() {
                 noteDisplay.textContent = getNoteContent();
                 noteOverlay.classList.add('active');
@@ -690,7 +944,6 @@
                 noteOverlay.classList.remove('active');
             }
 
-            // ---- 密码验证 ----
             function verifyPassword() {
                 const input = passwordInput.value.trim();
                 if (input === CORRECT_PASSWORD) {
@@ -707,11 +960,6 @@
                 }
             }
 
-            // ============================================================
-            //  事件绑定
-            // ============================================================
-
-            // ---- 标题点击计数（无任何提示） ----
             header.addEventListener('click', function(e) {
                 clickCount++;
                 clearTimeout(clickTimer);
@@ -726,7 +974,6 @@
                 }
             });
 
-            // ---- 密码确认 ----
             pwdConfirmBtn.addEventListener('click', verifyPassword);
             passwordInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
@@ -735,20 +982,17 @@
                 }
             });
 
-            // ---- 密码取消 ----
             pwdCancelBtn.addEventListener('click', closePasswordDialog);
             passwordOverlay.addEventListener('click', function(e) {
                 if (e.target === this) closePasswordDialog();
             });
 
-            // ---- 关闭记事本 ----
             noteCloseBtn.addEventListener('click', closeNote);
             noteCloseBtn2.addEventListener('click', closeNote);
             noteOverlay.addEventListener('click', function(e) {
                 if (e.target === this) closeNote();
             });
 
-            // ---- ESC 关闭弹窗 ----
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     if (noteOverlay.classList.contains('active')) {
@@ -758,7 +1002,6 @@
                     }
                 }
             });
-
         })();
     </script>
 
