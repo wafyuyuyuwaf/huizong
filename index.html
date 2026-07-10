@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>工具箱</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..600&display=swap" rel="stylesheet" />
+
     <style>
-        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -14,826 +17,619 @@
         }
 
         body {
-            font-family: 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
+            font-family: 'Inter', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            background: #f5f7fb;
             display: flex;
             justify-content: center;
-            padding: 2rem 1.5rem 3rem;
+            padding: 2.8rem 1.5rem 4rem;
+            position: relative;
+            overflow-x: hidden;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(180, 170, 155, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(150, 150, 155, 0.1) 0%, transparent 60%),
+                #faf8f5;
+            color: #1d2a33;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='fiber'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4' result='noise'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 0.95 0 0 0  0 0.9 0 0 0  0 0 0 0.08 0' in='noise' result='coloredNoise'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23fiber)'/%3E%3C/svg%3E");
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 680px;
             width: 100%;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 82vh;
         }
 
-        /* ===== 头部 ===== */
         .header {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             justify-content: space-between;
-            padding-bottom: 1.2rem;
-            border-bottom: 1px solid #e9edf4;
-            margin-bottom: 2rem;
+            margin-bottom: 2.6rem;
             flex-wrap: wrap;
-            gap: 0.8rem;
+            gap: 0.5rem;
         }
 
         .header-left {
             display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            cursor: pointer;
+            align-items: baseline;
+            gap: 0.7rem;
+            cursor: default;
             user-select: none;
         }
 
         .header-left h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
+            font-size: 1.4rem;
+            font-weight: 550;
+            color: #1d2a33;
+            letter-spacing: -0.4px;
         }
 
         .badge {
-            background: #eef2f7;
-            padding: 0.25rem 1rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            color: #475569;
-            font-weight: 500;
+            font-size: 0.8rem;
+            color: #9a9a94;
+            font-weight: 450;
+            letter-spacing: 0.1px;
         }
-
         .badge span {
-            font-weight: 700;
-            color: #1e293b;
+            font-weight: 550;
+            color: #5a5c60;
         }
 
         .btn-contact {
-            background: #eef2f7;
+            background: none;
             border: none;
-            padding: 0.25rem 1.2rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            color: #475569;
+            font-size: 0.82rem;
+            color: #7a7e82;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s, color 0.2s;
+            padding: 0.15rem 0;
+            transition: color 0.25s;
             font-family: inherit;
         }
-
         .btn-contact:hover {
-            background: #667eea;
-            color: #fff;
+            color: #1d2a33;
         }
 
-        /* ===== 卡片列表（一行一个，紧凑） ===== */
+        .meta-info {
+            font-size: 0.8rem;
+            color: #9a9a94;
+            margin-bottom: 2rem;
+            letter-spacing: 0.2px;
+            font-weight: 450;
+        }
+
         .grid {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            min-height: 200px;
+            gap: 0.9rem;
+            flex: 1;
         }
 
+        /* ===== 工具卡片：透明度 0.1，强化模糊与边框反馈 ===== */
         .tool-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 0.7rem 1.2rem;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-            border: 1px solid #edf2f7;
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+            background: rgba(252, 251, 249, 0.1);   /* 透明度改为 0.1 */
+            backdrop-filter: blur(14px);             /* 模糊加强，让背景纹理更柔和 */
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 10px;
+            padding: 1.2rem 1.35rem 1.05rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            cursor: default;
+            transition:
+                background 0.25s ease,
+                border-color 0.25s,
+                box-shadow 0.3s ease,
+                transform 0.1s ease;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            justify-content: space-between;
+            gap: 1.4rem;
             user-select: none;
+            position: relative;
         }
 
+        /* 悬停：透明度保持 0.1，只改变边框与阴影，暗示可点击 */
         .tool-card:hover {
-            background: #fafcff;
-            border-color: #cbd5e1;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            background: rgba(252, 251, 249, 0.1);   /* 保持透明 */
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
         }
 
         .tool-card:active {
-            transform: scale(0.99);
+            transform: scale(0.996);
+            background: rgba(248, 246, 243, 0.1);   /* 激活时也保持 0.1 */
+            transition: transform 0.06s ease, background 0.06s ease;
         }
 
         .tool-info {
             display: flex;
             flex-direction: column;
-            flex: 1;
             min-width: 0;
+            flex: 1;
         }
 
         .tool-name {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #0b1a33;
-            line-height: 1.3;
+            font-size: 0.98rem;
+            font-weight: 550;
+            color: #1d2a33;
+            line-height: 1.4;
+            margin-bottom: 0.2rem;
+            letter-spacing: -0.15px;
+            /* 轻微文字阴影增强对比（极淡） */
+            text-shadow: 0 0 1px rgba(255,255,255,0.6);
         }
 
         .tool-desc {
             font-size: 0.82rem;
-            color: #8896ab;
-            line-height: 1.4;
+            color: #6b7379;
+            line-height: 1.45;
+            font-weight: 430;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            text-shadow: 0 0 1px rgba(255,255,255,0.5);
         }
 
-        .card-footer {
+        .card-arrow {
             flex-shrink: 0;
-            font-size: 0.75rem;
-            color: #b0bcca;
-            font-weight: 500;
-            transition: color 0.2s;
-            margin-left: 0.5rem;
+            font-size: 0.95rem;
+            color: #c4c4bd;
+            font-weight: 400;
+            transition: color 0.3s, transform 0.35s, opacity 0.3s;
+            opacity: 0.6;
         }
 
-        .tool-card:hover .card-footer {
-            color: #667eea;
+        .tool-card:hover .card-arrow {
+            color: #5a5c60;
+            opacity: 1;
+            transform: translateX(3px);
         }
 
-        /* ===== 空状态 ===== */
         .empty-state {
-            grid-column: 1 / -1;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 4rem 2rem;
-            background: transparent;
-            border: none;
-            min-height: 280px;
+            color: #b0b2a8;
+            font-size: 0.85rem;
         }
 
-        /* ===== 密码弹窗 ===== */
+        .page-footer {
+            margin-top: auto;
+            padding-top: 2.8rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-footer::before {
+            content: '';
+            display: block;
+            width: 60%;
+            max-width: 240px;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.04);
+            margin: 0 auto 1.5rem;
+        }
+
+        .footer-link {
+            font-size: 0.82rem;
+            color: #9a9a94;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 450;
+            transition: color 0.25s, opacity 0.25s;
+            border-bottom: 1px dotted #c0c0b5;
+            padding-bottom: 2px;
+            opacity: 0.75;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-family: inherit;
+        }
+        .footer-link:hover {
+            color: #4a4c50;
+            opacity: 1;
+            border-bottom-style: solid;
+        }
+
+        .footer-link[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(50, 52, 55, 0.85);
+            color: #f0f0ea;
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 0.3px;
+            animation: fadeIn 0.2s ease 0.6s both;
+            backdrop-filter: blur(4px);
+        }
+
+        /* 密码弹窗 */
         .password-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.50);
-            backdrop-filter: blur(6px);
+            background: rgba(245, 243, 239, 0.7);
+            backdrop-filter: blur(10px);
             z-index: 10000;
             display: none;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.2s ease;
         }
-
-        .password-overlay.active {
-            display: flex;
-        }
+        .password-overlay.active { display: flex; }
 
         .password-modal {
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 40px 44px 36px;
-            max-width: 400px;
-            width: 92%;
-            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.30);
+            background: rgba(255, 254, 252, 0.95);
+            border-radius: 20px;
+            padding: 36px 38px 32px;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
             text-align: center;
-            animation: slideUp 0.3s ease;
+            animation: slideUp 0.2s cubic-bezier(0.2, 0.9, 0.4, 1);
         }
 
-        .password-modal .lock-icon {
-            font-size: 52px;
-            display: block;
-            margin-bottom: 6px;
+        .lock-icon {
+            display: inline-block;
+            width: 28px;
+            height: 24px;
+            margin-bottom: 12px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        .lock-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 14px;
+            border: 2px solid #3a3c40;
+            border-radius: 14px 14px 0 0;
+            border-bottom: none;
+        }
+        .lock-icon::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            background: #3a3c40;
+            border-radius: 3px;
         }
 
         .password-modal h2 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1e293b;
+            font-size: 1.1rem;
+            font-weight: 550;
+            color: #1d2a33;
             margin-bottom: 4px;
         }
-
         .password-modal .sub {
-            font-size: 14px;
-            color: #94a3b8;
+            font-size: 0.8rem;
+            color: #8a8d90;
             margin-bottom: 22px;
+            font-weight: 420;
         }
 
-        .password-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
+        .password-input-group { display: flex; flex-direction: column; gap: 10px; }
         .password-input-group input {
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 16px;
-            outline: none;
+            padding: 11px 14px;
+            border: 1.5px solid #e0ded6;
+            border-radius: 12px;
+            font-size: 0.92rem;
             text-align: center;
-            letter-spacing: 6px;
-            font-weight: 600;
-            transition: border-color 0.25s, box-shadow 0.25s;
-        }
-
-        .password-input-group input:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
-        }
-
-        .password-input-group .pwd-error {
-            color: #ef4444;
-            font-size: 13px;
+            letter-spacing: 4px;
             font-weight: 500;
-            min-height: 22px;
+            background: #faf9f5;
+            outline: none;
+            transition: border-color 0.2s, border-width 0.2s;
+            font-family: inherit;
+            color: #1d2a33;
         }
+        .password-input-group input:focus { border-color: #a0a090; border-width: 1.8px; }
+        .pwd-error { color: #c45a4a; font-size: 0.76rem; font-weight: 500; min-height: 18px; }
 
         .password-btn {
-            padding: 14px;
-            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-            color: #fff;
+            padding: 10px;
+            background: #4a4c50;
+            color: #faf8f3;
             border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 700;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 550;
             cursor: pointer;
-            transition: transform 0.12s, box-shadow 0.2s;
-            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.25);
+            transition: background 0.2s, transform 0.1s;
+            font-family: inherit;
         }
-
-        .password-btn:hover {
-            box-shadow: 0 6px 28px rgba(124, 58, 237, 0.35);
-            transform: translateY(-1px);
-        }
-
-        .password-btn:active {
-            transform: scale(0.96);
-        }
+        .password-btn:hover { background: #2a2c30; }
+        .password-btn:active { transform: scale(0.97); }
 
         .password-cancel-btn {
-            padding: 10px;
+            padding: 6px;
             background: none;
-            color: #94a3b8;
+            color: #8a8d90;
             border: none;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: color 0.2s;
+            font-family: inherit;
         }
+        .password-cancel-btn:hover { color: #4a4c50; }
 
-        .password-cancel-btn:hover {
-            color: #64748b;
-        }
-
-        /* ===== 记事本弹窗（只读） ===== */
+        /* 记事本弹窗 */
         .note-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.50);
-            backdrop-filter: blur(6px);
+            background: rgba(245, 243, 239, 0.7);
+            backdrop-filter: blur(10px);
             z-index: 9999;
             display: none;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.2s ease;
         }
-
-        .note-overlay.active {
-            display: flex;
-        }
+        .note-overlay.active { display: flex; }
 
         .note-modal {
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 32px 36px 28px;
-            max-width: 680px;
-            width: 94%;
-            max-height: 88vh;
-            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.30);
+            background: rgba(255, 254, 252, 0.95);
+            border-radius: 20px;
+            padding: 28px 30px 24px;
+            max-width: 600px;
+            width: 92%;
+            max-height: 82vh;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
-            animation: slideUp 0.3s ease;
-            position: relative;
+            animation: slideUp 0.2s cubic-bezier(0.2, 0.9, 0.4, 1);
         }
-
-        .note-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .note-modal-header h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .note-modal-header .badge {
-            font-size: 12px;
-            font-weight: 600;
-            color: #94a3b8;
-            background: #f1f5f9;
-            padding: 4px 14px;
-            border-radius: 40px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .note-modal-close {
-            background: none;
-            border: none;
-            font-size: 26px;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 0 6px;
-            transition: color 0.2s, transform 0.2s;
-            line-height: 1;
-        }
-
-        .note-modal-close:hover {
-            color: #ef4444;
-            transform: rotate(90deg);
-        }
-
+        .note-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .note-modal-header h2 { font-size: 1rem; font-weight: 550; color: #1d2a33; }
+        .note-modal-close { background: none; border: none; font-size: 22px; color: #9a9a94; cursor: pointer; transition: color 0.2s, transform 0.2s; }
+        .note-modal-close:hover { color: #c45a4a; transform: rotate(90deg); }
         .note-display {
             width: 100%;
-            min-height: 320px;
-            max-height: 55vh;
-            padding: 18px 22px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 15px;
-            font-family: 'Segoe UI', 'PingFang SC', 'SF Mono', monospace;
-            line-height: 1.9;
-            color: #1e293b;
-            background: #fafbfc;
+            min-height: 260px;
+            max-height: 50vh;
+            padding: 14px 18px;
+            border: 1.5px solid #e6e3da;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            line-height: 1.7;
+            color: #2a2d33;
+            background: #faf9f5;
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-word;
-            user-select: text;
-            cursor: default;
         }
+        .note-modal-footer { display: flex; justify-content: flex-end; margin-top: 14px; }
+        .note-btn-close { padding: 7px 26px; border: none; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; background: #f0efe8; color: #4a4c50; transition: background 0.2s; font-family: inherit; }
+        .note-btn-close:hover { background: #e2e0d8; }
 
-        .note-display::-webkit-scrollbar {
-            width: 6px;
-        }
-        .note-display::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 8px;
-        }
-        .note-display::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 8px;
-        }
-        .note-display::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        .note-modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-
-        .note-btn-close {
-            padding: 10px 32px;
-            border: none;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            background: #f1f3f5;
-            color: #475569;
-            transition: transform 0.12s, box-shadow 0.2s;
-        }
-
-        .note-btn-close:hover {
-            background: #e9edf2;
-        }
-
-        .note-btn-close:active {
-            transform: scale(0.96);
-        }
-
-        .note-footer-hint {
-            font-size: 12px;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* ===== 联系弹窗 ===== */
+        /* 联系弹窗 */
         .contact-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.50);
-            backdrop-filter: blur(6px);
+            background: rgba(245, 243, 239, 0.7);
+            backdrop-filter: blur(10px);
             z-index: 9998;
             display: none;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.2s ease;
         }
-
-        .contact-overlay.active {
-            display: flex;
-        }
-
+        .contact-overlay.active { display: flex; }
         .contact-modal {
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 36px 44px 32px;
-            max-width: 420px;
-            width: 92%;
-            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.30);
-            animation: slideUp 0.3s ease;
-        }
-
-        .contact-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .contact-modal-header h2 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .contact-modal-close {
-            background: none;
-            border: none;
-            font-size: 28px;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 0 4px;
-            transition: color 0.2s, transform 0.2s;
-            line-height: 1;
-        }
-
-        .contact-modal-close:hover {
-            color: #ef4444;
-            transform: rotate(90deg);
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 16px;
-            background: #f8fafc;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid #eef2f7;
-        }
-
-        .contact-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .contact-item .label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #475569;
-            min-width: 44px;
-        }
-
-        .contact-item .value {
-            font-size: 15px;
-            font-weight: 500;
-            color: #1e293b;
-            font-family: 'SF Mono', 'Menlo', monospace;
-            letter-spacing: 0.5px;
-        }
-
-        .contact-item .copy-btn {
-            margin-left: auto;
-            background: #eef2f7;
-            border: none;
-            padding: 4px 14px;
+            background: rgba(255, 254, 252, 0.95);
             border-radius: 20px;
-            font-size: 12px;
-            color: #475569;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-            font-family: inherit;
-            font-weight: 500;
+            padding: 30px 36px 26px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            animation: slideUp 0.2s cubic-bezier(0.2, 0.9, 0.4, 1);
         }
+        .contact-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .contact-modal-header h2 { font-size: 1rem; font-weight: 550; color: #1d2a33; }
+        .contact-modal-close { background: none; border: none; font-size: 24px; color: #9a9a94; cursor: pointer; transition: color 0.2s, transform 0.2s; }
+        .contact-modal-close:hover { color: #c45a4a; transform: rotate(90deg); }
+        .contact-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #faf9f5; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ecebe3; }
+        .contact-item .label { font-size: 0.82rem; font-weight: 550; color: #4a4c50; min-width: 36px; }
+        .contact-item .value { font-size: 0.82rem; font-weight: 480; color: #1d2a33; letter-spacing: 0.2px; }
+        .copy-btn { margin-left: auto; background: #f0efe8; border: none; padding: 4px 14px; border-radius: 16px; font-size: 0.76rem; color: #5a5c60; cursor: pointer; transition: background 0.2s, color 0.2s; font-family: inherit; font-weight: 500; }
+        .copy-btn:hover { background: #e2e0d8; }
+        .copy-btn.copied { background: #e2e7dc; color: #2b5e3b; }
+        .contact-copy-hint { font-size: 0.73rem; color: #aaa; text-align: center; margin-top: 14px; }
 
-        .contact-item .copy-btn:hover {
-            background: #667eea;
-            color: #fff;
-        }
+        ::selection { background: rgba(180, 170, 155, 0.25); color: #1d2a33; }
 
-        .contact-copy-hint {
-            font-size: 12px;
-            color: #94a3b8;
-            text-align: center;
-            margin-top: 16px;
-        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.18); }
 
-        /* ===== 右下角留言按钮 ===== */
-        .btn-message {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #7ec8e3;
-            /* 浅蓝色，纯色，无渐变 */
-            color: #fff;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            /* box-shadow 已移除 */
-            transition: transform 0.2s;
-            font-family: inherit;
-            z-index: 9997;
-            letter-spacing: 0.5px;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes shake { 0%,100%{transform: translateX(0);} 20%{transform: translateX(-4px);} 40%{transform: translateX(4px);} 60%{transform: translateX(-2px);} 80%{transform: translateX(2px);} }
+        @keyframes cardReveal { 0% { opacity: 0; background: rgba(252,251,249,0.15); } 100% { opacity: 1; background: rgba(252,251,249,0.1); } }
 
-        .btn-message:hover {
-            transform: translateY(-3px);
-            /* box-shadow 已移除 */
-        }
-
-        .btn-message:active {
-            transform: scale(0.94);
-        }
-
-        /* ===== 动画 ===== */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @keyframes shake {
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-            20% {
-                transform: translateX(-10px);
-            }
-            40% {
-                transform: translateX(10px);
-            }
-            60% {
-                transform: translateX(-6px);
-            }
-            80% {
-                transform: translateX(6px);
-            }
-        }
-
-        /* ===== 响应式 ===== */
-        @media (max-width: 768px) {
+        /* 深色模式 */
+        @media (prefers-color-scheme: dark) {
             body {
-                padding: 1.2rem 1rem 2rem;
+                background:
+                    radial-gradient(ellipse at 20% 20%, rgba(55, 50, 42, 0.3) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 80%, rgba(40, 42, 45, 0.25) 0%, transparent 60%),
+                    #161513;
             }
-            .header-left h1 {
-                font-size: 1.4rem;
-            }
+            .header-left h1, .tool-name, .password-modal h2, .note-modal-header h2, .contact-modal-header h2 { color: #e0e4e7; }
+            .badge { color: #888880; }
+            .badge span { color: #b0b3b8; }
+            .btn-contact { color: #999b98; }
+            .btn-contact:hover { color: #d0d4d8; }
+            .meta-info { color: #7f807a; }
+
+            /* 深色卡片透明度 0.1 */
             .tool-card {
-                padding: 0.6rem 1rem;
-                border-radius: 10px;
+                background: rgba(30, 29, 27, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.2);
             }
-            .tool-name {
-                font-size: 0.95rem;
+            .tool-card:hover {
+                background: rgba(30, 29, 27, 0.1);
+                border-color: rgba(255, 255, 255, 0.15);
+                box-shadow: 0 4px 14px rgba(0,0,0,0.3);
             }
-            .tool-desc {
-                font-size: 0.78rem;
+            .tool-card:active {
+                background: rgba(30, 29, 27, 0.1);
             }
-            .contact-modal {
-                padding: 28px 24px 24px;
-            }
-            .contact-item {
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-            .contact-item .copy-btn {
-                margin-left: 0;
-                width: 100%;
-                text-align: center;
-                padding: 6px;
-            }
-            .btn-message {
-                bottom: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                font-size: 14px;
-            }
+
+            .tool-desc { color: #8f9398; text-shadow: 0 0 1px rgba(0,0,0,0.5); }
+            .tool-name { text-shadow: 0 0 1px rgba(0,0,0,0.5); }
+            .card-arrow { color: #6a6a60; }
+            .tool-card:hover .card-arrow { color: #b0b3b8; }
+            .password-modal, .note-modal, .contact-modal { background: rgba(30, 29, 26, 0.95); }
+            .password-input-group input, .note-display { background: #22201d; border-color: #3e3c38; color: #e0e4e7; }
+            .contact-item { background: #22201d; border-color: #363430; }
+            .contact-item .value { color: #e0e4e7; }
+            .copy-btn { background: #2a2824; color: #b0b3b8; }
+            .note-btn-close { background: #2a2824; color: #c0c4c8; }
+            .footer-link { color: #888880; border-bottom-color: #5a5a52; }
+            .footer-link:hover { color: #d0d4d8; }
+            .lock-icon::before, .lock-icon::after { border-color: #d0d4d8; background: #d0d4d8; }
         }
 
-        @media (max-width: 480px) {
-            .header-left h1 {
-                font-size: 1.2rem;
-            }
-            .badge {
-                font-size: 0.75rem;
-                padding: 0.2rem 0.8rem;
-            }
-            .btn-contact {
-                font-size: 0.75rem;
-                padding: 0.2rem 0.8rem;
-            }
-            .tool-card {
-                padding: 0.5rem 0.8rem;
-                gap: 0.5rem;
-            }
-            .tool-name {
-                font-size: 0.9rem;
-            }
-            .tool-desc {
-                font-size: 0.72rem;
-                white-space: nowrap;
-            }
-            .card-footer {
-                font-size: 0.7rem;
-            }
-            .btn-message {
-                bottom: 16px;
-                right: 16px;
-                padding: 10px 16px;
-                font-size: 13px;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #eef2f7;
-            border-radius: 6px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d0d9e8;
-            border-radius: 6px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #b0bcca;
+        @media (max-width: 600px) {
+            body { padding: 2rem 1.2rem 3rem; }
+            .header-left h1 { font-size: 1.25rem; }
+            .tool-card { padding: 1.05rem 1.1rem 0.95rem; }
+            .tool-name { font-size: 0.92rem; }
+            .tool-desc { font-size: 0.78rem; }
         }
     </style>
 </head>
 
 <body>
-
-    <div class="container">
-
-        <!-- ===== 头部 ===== -->
-        <header class="header">
-            <div class="header-left" id="headerTrigger">
-                <h1>工具箱</h1>
-                <span class="badge">共 <span id="toolCount">0</span> 个工具</span>
-            </div>
-            <div class="header-right">
-                <button class="btn-contact" id="contactBtn">联系</button>
-            </div>
-        </header>
-
-        <!-- ===== 卡片网格 ===== -->
-        <div class="grid" id="toolGrid">
-            <!-- 由 JavaScript 动态渲染 -->
+<div class="container">
+    <header class="header">
+        <div class="header-left" id="headerTrigger">
+            <h1>工具箱</h1>
+            <span class="badge"><span id="toolCount">0</span> 个工具</span>
         </div>
+        <div class="header-right">
+            <button class="btn-contact" id="contactBtn">联系</button>
+        </div>
+    </header>
 
+    <div class="meta-info" id="metaInfo">加载中…</div>
+
+    <div class="grid" id="toolGrid">
+        <!-- JS 动态渲染 -->
     </div>
 
-    <!-- ===== 右下角留言按钮 ===== -->
-    <button class="btn-message" id="messageBtn">💬 留言</button>
-
-    <!-- ============================================================
-    你好
-    ============================================================ -->
-    <div id="noteSource" style="display:none;">
-
+    <div class="page-footer">
+        <button class="footer-link" id="messageBtn" data-tooltip="或按 M 键留言">需要帮助</button>
     </div>
+</div>
 
-    <!-- ============================================================
-    🔒 密码弹窗
-    ============================================================ -->
-    <div class="password-overlay" id="passwordOverlay">
-        <div class="password-modal">
-            <span class="lock-icon">🔒</span>
-            <h2>输入密码</h2>
-            <p class="sub">请输入密码以查看隐藏记事本</p>
-            <div class="password-input-group">
-                <input type="password" id="passwordInput" placeholder="请输入密码" maxlength="20" autocomplete="off" />
-                <div class="pwd-error" id="pwdError"></div>
-                <button class="password-btn" id="pwdConfirmBtn">确认</button>
-                <button class="password-cancel-btn" id="pwdCancelBtn">取消</button>
-            </div>
+<div id="noteSource" style="display:none;">
+    这里是隐藏笔记，可以记录私密内容。
+</div>
+
+<!-- 密码弹窗 -->
+<div class="password-overlay" id="passwordOverlay">
+    <div class="password-modal">
+        <span class="lock-icon" id="lockIcon"></span>
+        <h2>输入密码</h2>
+        <p class="sub">查看隐藏笔记</p>
+        <div class="password-input-group">
+            <input type="password" id="passwordInput" placeholder="密码" maxlength="20" autocomplete="off" />
+            <div class="pwd-error" id="pwdError"></div>
+            <button class="password-btn" id="pwdConfirmBtn">确认</button>
+            <button class="password-cancel-btn" id="pwdCancelBtn">取消</button>
         </div>
     </div>
+</div>
 
-    <!-- ============================================================
-    📖 记事本弹窗（只读展示）
-    ============================================================ -->
-    <div class="note-overlay" id="noteOverlay">
-        <div class="note-modal">
-            <div class="note-modal-header">
-                <h2>
-                    <span>📓</span> 我的笔记
-                    <span class="badge">🔒 只读</span>
-                </h2>
-                <button class="note-modal-close" id="noteCloseBtn">&times;</button>
-            </div>
-            <div class="note-display" id="noteDisplay"></div>
-            <div class="note-modal-footer">
-                <span class="note-footer-hint">📌 内容只读 · 不可编辑</span>
-                <button class="note-btn-close" id="noteCloseBtn2">✕ 关闭</button>
-            </div>
+<!-- 记事本弹窗 -->
+<div class="note-overlay" id="noteOverlay">
+    <div class="note-modal">
+        <div class="note-modal-header">
+            <h2>笔记</h2>
+            <button class="note-modal-close" id="noteCloseBtn">&times;</button>
+        </div>
+        <div class="note-display" id="noteDisplay"></div>
+        <div class="note-modal-footer">
+            <button class="note-btn-close" id="noteCloseBtn2">关闭</button>
         </div>
     </div>
+</div>
 
-    <!-- ============================================================
-    📞 联系弹窗
-    ============================================================ -->
-    <div class="contact-overlay" id="contactOverlay">
-        <div class="contact-modal">
-            <div class="contact-modal-header">
-                <h2>📞 联系方式</h2>
-                <button class="contact-modal-close" id="contactCloseBtn">&times;</button>
-            </div>
-            <div class="contact-item">
-                <span class="label">微信</span>
-                <span class="value">beron_yuyuyu</span>
-                <button class="copy-btn" data-copy="beron_yuyuyu">复制</button>
-            </div>
-            <div class="contact-item">
-                <span class="label">QQ</span>
-                <span class="value">3586338672</span>
-                <button class="copy-btn" data-copy="3586338672">复制</button>
-            </div>
-            <div class="contact-copy-hint">点击「复制」可复制到剪贴板</div>
+<!-- 联系弹窗 -->
+<div class="contact-overlay" id="contactOverlay">
+    <div class="contact-modal">
+        <div class="contact-modal-header">
+            <h2>联系方式</h2>
+            <button class="contact-modal-close" id="contactCloseBtn">&times;</button>
         </div>
+        <div class="contact-item">
+            <span class="label">微信</span>
+            <span class="value">beron_yuyuyu</span>
+            <button class="copy-btn" data-copy="beron_yuyuyu">复制</button>
+        </div>
+        <div class="contact-item">
+            <span class="label">QQ</span>
+            <span class="value">3586338672</span>
+            <button class="copy-btn" data-copy="3586338672">复制</button>
+        </div>
+        <div class="contact-copy-hint">点击复制到剪贴板</div>
     </div>
+</div>
 
-    <script>
-        // ============================================================
-        //  1. 工具箱数据渲染
-        // ============================================================
-        const tools = [{
-            name: '拼豆图纸像素化',
-            description: '图片转像素图纸，支持坐标轴与颜色精度',
-            icon: '',
-            path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/tmtx.html'
-        }, {
-            name: '透明图像生成',
-            description: '为图片添加圆角矩形阴影，输出透明PNG',
-            icon: '',
-            path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/scpdtz.html'
-        }, {
-            name: '多图层编辑器',
-            description: '图层叠加、滤镜、裁剪、擦除、取色等高级编辑',
-            icon: '',
-            path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/ystq&gszh.html'
-        }, {
-            name: '边缘渐变遮罩（微信背景生成）',
-            description: '可自由调节顶部和底部的渐变遮罩位置及过渡柔化范围（0~30%），实时预览效果，主要用于优化微信背景图',
-            icon: '',
-            path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/边缘渐变遮罩（微信背景生成）.html'
-        }];
+<script>
+    (function() {
+        const tools = [
+            { name: '拼豆图纸像素化', description: '图片转像素图纸，支持坐标轴与颜色精度', path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/tmtx.html' },
+            { name: '透明图像生成', description: '为图片添加圆角矩形阴影，输出透明PNG', path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/scpdtz.html' },
+            { name: '多图层编辑器', description: '图层叠加、滤镜、裁剪、擦除、取色等高级编辑', path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/ystq&gszh.html' },
+            { name: '边缘渐变遮罩（微信背景生成）', description: '自由调节顶部和底部渐变遮罩位置及过渡柔化范围', path: 'https://wafyuyuyuwaf.github.io/wafyuyuyuwaf/my_tools/边缘渐变遮罩（微信背景生成）.html' }
+        ];
 
         const grid = document.getElementById('toolGrid');
         const countEl = document.getElementById('toolCount');
+        const metaInfo = document.getElementById('metaInfo');
 
         function escapeHtml(text) {
             const d = document.createElement('div');
@@ -843,233 +639,172 @@
 
         function render() {
             countEl.textContent = tools.length;
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = now.getMonth() + 1;
+            metaInfo.textContent = `${y} 年 ${m} 月 · ${tools.length} 个可用工具`;
+
             if (tools.length === 0) {
-                grid.innerHTML = `<div class="empty-state">暂无工具</div>`;
+                grid.innerHTML = '<div class="empty-state">暂无工具</div>';
                 return;
             }
             let html = '';
-            tools.forEach(t => {
-                const desc = t.description || '点击打开';
-                const safePath = t.path.replace(/"/g, '&quot;');
+            tools.forEach((t, i) => {
                 html += `
-                            <div class="tool-card" data-path="${safePath}" role="button" tabindex="0">
-                                <div class="tool-info">
-                                    <div class="tool-name">${escapeHtml(t.name)}</div>
-                                    <div class="tool-desc">${escapeHtml(desc)}</div>
-                                </div>
-                                <div class="card-footer">打开 →</div>
-                            </div>
-                        `;
+                    <div class="tool-card" data-path="${t.path.replace(/"/g, '&quot;')}" role="button" tabindex="0"
+                         style="animation: cardReveal 0.45s ease ${i * 0.07}s both;">
+                        <div class="tool-info">
+                            <div class="tool-name">${escapeHtml(t.name)}</div>
+                            <div class="tool-desc">${escapeHtml(t.description)}</div>
+                        </div>
+                        <span class="card-arrow">→</span>
+                    </div>
+                `;
             });
             grid.innerHTML = html;
         }
 
-        // 卡片点击打开新窗口
-        grid.addEventListener('click', (e) => {
+        render();
+
+        grid.addEventListener('click', e => {
             const card = e.target.closest('.tool-card');
             if (!card) return;
             const path = card.getAttribute('data-path');
-            if (path) window.open(path, '_blank');
+            if (path) setTimeout(() => window.open(path, '_blank'), 100);
         });
 
-        render();
-
-        // ============================================================
-        //  2. 右下角留言按钮
-        // ============================================================
-        document.getElementById('messageBtn').addEventListener('click', function() {
-            window.open('https://wafyuyuyuwaf.github.io/jishiben/index.html', '_blank');
+        document.getElementById('messageBtn').addEventListener('click', () => window.open('https://wafyuyuyuwaf.github.io/jishiben/index.html', '_blank'));
+        document.addEventListener('keydown', e => {
+            if (e.key === 'm' || e.key === 'M') {
+                if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+                window.open('https://wafyuyuyuwaf.github.io/jishiben/index.html', '_blank');
+            }
         });
 
-        // ============================================================
-        //  3. 联系弹窗
-        // ============================================================
-        (function() {
-            const contactBtn = document.getElementById('contactBtn');
-            const contactOverlay = document.getElementById('contactOverlay');
-            const contactCloseBtn = document.getElementById('contactCloseBtn');
+        const contactBtn = document.getElementById('contactBtn');
+        const contactOverlay = document.getElementById('contactOverlay');
+        const contactCloseBtn = document.getElementById('contactCloseBtn');
 
-            function openContact() {
-                contactOverlay.classList.add('active');
-            }
+        function openContact() { contactOverlay.classList.add('active'); }
+        function closeContact() { contactOverlay.classList.remove('active'); }
+        contactBtn.addEventListener('click', openContact);
+        contactCloseBtn.addEventListener('click', closeContact);
+        contactOverlay.addEventListener('click', e => { if (e.target === contactOverlay) closeContact(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && contactOverlay.classList.contains('active')) closeContact(); });
 
-            function closeContact() {
-                contactOverlay.classList.remove('active');
-            }
-
-            contactBtn.addEventListener('click', openContact);
-            contactCloseBtn.addEventListener('click', closeContact);
-            contactOverlay.addEventListener('click', function(e) {
-                if (e.target === this) closeContact();
-            });
-
-            // ESC 关闭
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && contactOverlay.classList.contains('active')) {
-                    closeContact();
-                }
-            });
-
-            // 复制功能
-            document.querySelectorAll('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const text = this.getAttribute('data-copy');
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(text).then(() => {
-                            const orig = this.textContent;
-                            this.textContent = '✅ 已复制';
-                            setTimeout(() => { this.textContent = orig; }, 1500);
-                        }).catch(() => {
-                            fallbackCopy(text, this);
-                        });
-                    } else {
-                        fallbackCopy(text, this);
-                    }
-                });
-            });
-
-            function fallbackCopy(text, btn) {
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                textarea.style.left = '-9999px';
-                document.body.appendChild(textarea);
-                textarea.select();
-                try {
-                    document.execCommand('copy');
-                    const orig = btn.textContent;
-                    btn.textContent = '✅ 已复制';
-                    setTimeout(() => { btn.textContent = orig; }, 1500);
-                } catch (_) {
-                    alert('复制失败，请手动复制：' + text);
-                }
-                document.body.removeChild(textarea);
-            }
-        })();
-
-        // ============================================================
-        //  4. 隐藏记事本功能（点击标题5次触发密码）
-        // ============================================================
-        (function() {
-            'use strict';
-
-            const header = document.getElementById('headerTrigger');
-            const passwordOverlay = document.getElementById('passwordOverlay');
-            const noteOverlay = document.getElementById('noteOverlay');
-            const passwordInput = document.getElementById('passwordInput');
-            const pwdError = document.getElementById('pwdError');
-            const pwdConfirmBtn = document.getElementById('pwdConfirmBtn');
-            const pwdCancelBtn = document.getElementById('pwdCancelBtn');
-            const noteDisplay = document.getElementById('noteDisplay');
-            const noteCloseBtn = document.getElementById('noteCloseBtn');
-            const noteCloseBtn2 = document.getElementById('noteCloseBtn2');
-
-            const CORRECT_PASSWORD = '123';
-            let clickCount = 0;
-            let clickTimer = null;
-
-            function getNoteContent() {
-                const source = document.getElementById('noteSource');
-                return source ? (source.textContent || source.innerText || '') :
-                    '📝 暂无笔记内容，请在 HTML 中编辑 noteSource。';
-            }
-
-            function openPasswordDialog() {
-                passwordOverlay.classList.add('active');
-                passwordInput.value = '';
-                pwdError.textContent = '';
-                setTimeout(() => passwordInput.focus(), 100);
-            }
-
-            function closePasswordDialog() {
-                passwordOverlay.classList.remove('active');
-                passwordInput.value = '';
-                pwdError.textContent = '';
-            }
-
-            function openNote() {
-                noteDisplay.textContent = getNoteContent();
-                noteOverlay.classList.add('active');
-                noteDisplay.scrollTop = 0;
-            }
-
-            function closeNote() {
-                noteOverlay.classList.remove('active');
-            }
-
-            function verifyPassword() {
-                const input = passwordInput.value.trim();
-                if (input === CORRECT_PASSWORD) {
-                    closePasswordDialog();
-                    openNote();
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const text = this.getAttribute('data-copy');
+                const success = () => {
+                    this.classList.add('copied');
+                    this.textContent = '已复制';
+                    setTimeout(() => { this.classList.remove('copied'); this.textContent = '复制'; }, 1500);
+                };
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(success).catch(() => fallbackCopy(text, this));
                 } else {
-                    pwdError.textContent = '❌ 密码错误，请重试';
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                    passwordInput.style.animation = 'none';
-                    requestAnimationFrame(() => {
-                        passwordInput.style.animation = 'shake 0.4s ease';
-                    });
+                    fallbackCopy(text, this);
                 }
-            }
+            });
+        });
 
-            header.addEventListener('click', function(e) {
-                clickCount++;
+        function fallbackCopy(text, btn) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); btn.classList.add('copied'); btn.textContent = '已复制'; setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '复制'; }, 1500); }
+            catch(e) { alert('复制失败：' + text); }
+            document.body.removeChild(ta);
+        }
+
+        const header = document.getElementById('headerTrigger');
+        const pwOverlay = document.getElementById('passwordOverlay');
+        const noteOverlay = document.getElementById('noteOverlay');
+        const pwInput = document.getElementById('passwordInput');
+        const pwdError = document.getElementById('pwdError');
+        const lockIcon = document.getElementById('lockIcon');
+
+        let clickCount = 0, clickTimer;
+
+        header.addEventListener('click', () => {
+            clickCount++;
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => clickCount = 0, 800);
+            if (clickCount >= 5) {
+                clickCount = 0;
                 clearTimeout(clickTimer);
-                clickTimer = setTimeout(() => {
-                    clickCount = 0;
-                }, 800);
+                pwOverlay.classList.add('active');
+                pwInput.value = '';
+                pwdError.textContent = '';
+                lockIcon.style.transform = '';
+                setTimeout(() => pwInput.focus(), 100);
+            }
+        });
 
-                if (clickCount >= 5) {
-                    clickCount = 0;
-                    clearTimeout(clickTimer);
-                    openPasswordDialog();
-                }
-            });
+        document.getElementById('pwdConfirmBtn').addEventListener('click', verify);
+        pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') verify(); });
+        document.getElementById('pwdCancelBtn').addEventListener('click', () => pwOverlay.classList.remove('active'));
+        pwOverlay.addEventListener('click', e => { if (e.target === pwOverlay) pwOverlay.classList.remove('active'); });
 
-            pwdConfirmBtn.addEventListener('click', verifyPassword);
-            passwordInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    verifyPassword();
-                }
-            });
+        function playClickSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.frequency.value = 800;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.03);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.03);
+            } catch(e) {}
+        }
 
-            pwdCancelBtn.addEventListener('click', closePasswordDialog);
-            passwordOverlay.addEventListener('click', function(e) {
-                if (e.target === this) closePasswordDialog();
-            });
+        function verify() {
+            if (pwInput.value.trim() === '123') {
+                lockIcon.style.transform = 'rotate(10deg)';
+                playClickSound();
+                setTimeout(() => {
+                    lockIcon.style.transform = '';
+                    pwOverlay.classList.remove('active');
+                    document.getElementById('noteDisplay').textContent = document.getElementById('noteSource').textContent.trim();
+                    noteOverlay.classList.add('active');
+                }, 300);
+            } else {
+                pwdError.textContent = '密码错误';
+                pwInput.value = '';
+                pwInput.focus();
+                pwInput.style.animation = 'none';
+                requestAnimationFrame(() => pwInput.style.animation = 'shake 0.3s ease');
+            }
+        }
 
-            noteCloseBtn.addEventListener('click', closeNote);
-            noteCloseBtn2.addEventListener('click', closeNote);
-            noteOverlay.addEventListener('click', function(e) {
-                if (e.target === this) closeNote();
-            });
+        document.getElementById('noteCloseBtn').addEventListener('click', () => noteOverlay.classList.remove('active'));
+        document.getElementById('noteCloseBtn2').addEventListener('click', () => noteOverlay.classList.remove('active'));
+        noteOverlay.addEventListener('click', e => { if (e.target === noteOverlay) noteOverlay.classList.remove('active'); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                if (noteOverlay.classList.contains('active')) noteOverlay.classList.remove('active');
+                else if (pwOverlay.classList.contains('active')) pwOverlay.classList.remove('active');
+            }
+        });
+    })();
+</script>
 
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    if (noteOverlay.classList.contains('active')) {
-                        closeNote();
-                    } else if (passwordOverlay.classList.contains('active')) {
-                        closePasswordDialog();
-                    }
-                }
-            });
-        })();
-    </script>
-
-    <!-- 百度统计 -->
-    <script>
-        var _hmt = _hmt || [];
-        (function() {
-            var hm = document.createElement("script");
-            hm.src = "https://hm.baidu.com/hm.js?8e8f13e84569f787c7961631aab77577";
-            var s = document.getElementsByTagName("script")[0];
-            s.parentNode.insertBefore(hm, s);
-        })();
-    </script>
-
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?8e8f13e84569f787c7961631aab77577";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
 </body>
 </html>
