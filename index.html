@@ -558,7 +558,8 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #7ec8e3;
+            /* 浅蓝色，纯色，无渐变 */
             color: #fff;
             border: none;
             padding: 14px 24px;
@@ -566,8 +567,8 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 6px 24px rgba(102, 126, 234, 0.40);
-            transition: transform 0.2s, box-shadow 0.2s;
+            /* box-shadow 已移除 */
+            transition: transform 0.2s;
             font-family: inherit;
             z-index: 9997;
             letter-spacing: 0.5px;
@@ -575,7 +576,7 @@
 
         .btn-message:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 36px rgba(102, 126, 234, 0.50);
+            /* box-shadow 已移除 */
         }
 
         .btn-message:active {
@@ -742,7 +743,7 @@
     你好
     ============================================================ -->
     <div id="noteSource" style="display:none;">
-        
+
     </div>
 
     <!-- ============================================================
@@ -851,14 +852,14 @@
                 const desc = t.description || '点击打开';
                 const safePath = t.path.replace(/"/g, '&quot;');
                 html += `
-                        <div class="tool-card" data-path="${safePath}" role="button" tabindex="0">
-                            <div class="tool-info">
-                                <div class="tool-name">${escapeHtml(t.name)}</div>
-                                <div class="tool-desc">${escapeHtml(desc)}</div>
+                            <div class="tool-card" data-path="${safePath}" role="button" tabindex="0">
+                                <div class="tool-info">
+                                    <div class="tool-name">${escapeHtml(t.name)}</div>
+                                    <div class="tool-desc">${escapeHtml(desc)}</div>
+                                </div>
+                                <div class="card-footer">打开 →</div>
                             </div>
-                            <div class="card-footer">打开 →</div>
-                        </div>
-                    `;
+                        `;
             });
             grid.innerHTML = html;
         }
@@ -1061,13 +1062,13 @@
 
     <!-- 百度统计 -->
     <script>
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?8e8f13e84569f787c7961631aab77577";
-      var s = document.getElementsByTagName("script")[0]; 
-      s.parentNode.insertBefore(hm, s);
-    })();
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?8e8f13e84569f787c7961631aab77577";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
     </script>
 
 </body>
